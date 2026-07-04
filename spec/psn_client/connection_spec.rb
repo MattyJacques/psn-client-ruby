@@ -1,0 +1,63 @@
+# frozen_string_literal: true
+
+RSpec.describe PSN::Connection do
+  subject(:connection) { described_class.new(auth, retry_options: { max: 0 }) }
+
+  let(:auth) { instance_double(PSN::Auth, access_token: "tok-1", refresh!: nil) }
+  let(:url) { "https://m.np.playstation.com/api/test" }
+
+  def json_response(body, status: 200)
+    { status: status, body: body.to_json, headers: { "Content-Type" => "application/json" } }
+  end
+
+  it "performs an authorized GET against the mobile host and parses JSON" do
+    stub_request(:get, url)
+      .with(query: { "limit" => "10" }, headers: { "Authorization" => "Bearer tok-1" })
+      .to_return(json_response({ "ok" => true }))
+
+    expect(connection.get(:mobile, "/api/test", { "limit" => 10 })).to eq("ok" => true)
+  end
+
+  it "performs a JSON POST against the web host" do
+    stub_request(:post, "https://web.np.playstation.com/api/test")
+      .with(body: { "a" => 1 }.to_json, headers: { "Authorization" => "Bearer tok-1" })
+      .to_return(json_response({ "ok" => true }))
+
+    expect(connection.post(:web, "/api/test", { "a" => 1 })).to eq("ok" => true)
+  end
+
+  it "refreshes and retries exactly once on 401" do
+    stub_request(:get, url).to_return({ status: 401 }, json_response({ "ok" => true }))
+
+    expect(connection.get(:mobile, "/api/test")).to eq("ok" => true)
+    expect(auth).to have_received(:refresh!).once
+  end
+
+  it "raises AuthenticationError when 401 persists after refresh" do
+    stub_request(:get, url).to_return(status: 401)
+    expect { connection.get(:mobile, "/api/test") }.to raise_error(PSN::AuthenticationError)
+    expect(auth).to have_received(:refresh!).once
+  end
+
+  it "maps 403 to PrivacyError" do
+    stub_request(:get, url).to_return(status: 403)
+    expect { connection.get(:mobile, "/api/test") }.to raise_error(PSN::PrivacyError)
+  end
+
+  it "maps 404 to NotFoundError" do
+    stub_request(:get, url).to_return(status: 404)
+    expect { connection.get(:mobile, "/api/test") }.to raise_error(PSN::NotFoundError)
+  end
+
+  it "maps 429 to RateLimitError with retry_after" do
+    stub_request(:get, url).to_return(status: 429, headers: { "Retry-After" => "30" })
+    expect { connection.get(:mobile, "/api/test") }
+      .to raise_error(PSN::RateLimitError) { |e| expect(e.retry_after).to eq(30) }
+  end
+
+  it "maps other failures to APIError with the response attached" do
+    stub_request(:get, url).to_return(json_response({ "error" => "boom" }, status: 500))
+    expect { connection.get(:mobile, "/api/test") }
+      .to raise_error(PSN::APIError) { |e| expect(e.response[:status]).to eq(500) }
+  end
+end
