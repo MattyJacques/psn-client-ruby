@@ -1,0 +1,8 @@
+{
+  "trophyId": 1,
+  "trophyHidden": false,
+  "trophyType": "gold",
+  "trophyName": "One Small Step",
+  "trophyDetail": "Take your first step.",
+  "trophyIconUrl": "https://image.api.playstation.com/t.png"
+}
