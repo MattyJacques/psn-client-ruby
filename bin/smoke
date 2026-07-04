@@ -1,0 +1,48 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# Manual live-API check. NOT part of the test suite. Usage (PowerShell):
+#   $env:PSN_NPSSO = "<token>"; ruby bin/smoke
+# or with a saved refresh token:
+#   $env:PSN_REFRESH_TOKEN = "<token>"; ruby bin/smoke
+
+$LOAD_PATH.unshift File.expand_path("../lib", __dir__)
+require "psn_client"
+
+npsso = ENV.fetch("PSN_NPSSO", nil)
+refresh = ENV.fetch("PSN_REFRESH_TOKEN", nil)
+abort "Set PSN_NPSSO or PSN_REFRESH_TOKEN" unless npsso || refresh
+
+client = npsso ? PSN::Client.new(npsso: npsso) : PSN::Client.new(refresh_token: refresh)
+
+def section(name)
+  puts "\n== #{name}"
+  yield
+rescue PSN::Error => e
+  puts "FAILED: #{e.class}: #{e.message}"
+  puts "        response: #{e.response.inspect}" if e.response
+end
+
+section("Trophy summary") do
+  s = client.trophies.summary
+  puts "level #{s.level}, counts #{s.earned_counts}"
+end
+
+section("5 most recent games") do
+  client.games.played.first(5).each { |g| puts "#{g.name} [#{g.platform}] plays=#{g.play_count}" }
+end
+
+section("5 trophy titles") do
+  client.trophies.titles.first(5).each { |t| puts "#{t.name} (#{t.progress}%)" }
+end
+
+section("5 transactions") do
+  client.store.transactions.first(5).each { |t| puts "#{t.date} #{t.description} #{t.amount} #{t.currency}" }
+end
+
+section("5 entitlements") do
+  client.store.entitlements.first(5).each { |e| puts "#{e.name} [#{e.platform}] #{e.acquired_at}" }
+end
+
+puts "\nRefresh token (persist for next session):"
+puts client.refresh_token
