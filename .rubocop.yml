@@ -32,9 +32,6 @@ Metrics/BlockLength:
 RSpec/ExampleLength:
   Max: 15
 
-RSpec/MultipleExpectations:
-  Max: 5
-
 RSpec/DescribeClass:
   Exclude:
     - "spec/psn_client/models/trophy_models_spec.rb"
@@ -45,3 +42,10 @@ RSpec/SpecFilePathFormat:
     PSN: psn_client
   Exclude:
     - "spec/psn_client/errors_spec.rb"
+    - "spec/psn_client/models/game_title_spec.rb"
+    - "spec/psn_client/models/trophy_models_spec.rb"
+
+RSpec/MultipleExpectations:
+  Max: 8
+  Exclude:
+    - "spec/psn_client/models/**/*_spec.rb"

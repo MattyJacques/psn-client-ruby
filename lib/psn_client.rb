@@ -5,6 +5,11 @@ require_relative "psn_client/errors"
 require_relative "psn_client/auth"
 require_relative "psn_client/connection"
 require_relative "psn_client/paginator"
+require_relative "psn_client/models/mapping"
+require_relative "psn_client/models/game_title"
+require_relative "psn_client/models/trophy_title"
+require_relative "psn_client/models/trophy"
+require_relative "psn_client/models/trophy_summary"
 
 # Unofficial PlayStation Network API client.
 module PSN

@@ -1,0 +1,7 @@
+{
+  "accountId": "1234567890",
+  "trophyLevel": 401,
+  "progress": 60,
+  "tier": 3,
+  "earnedTrophies": { "bronze": 800, "silver": 400, "gold": 100, "platinum": 10 }
+}
