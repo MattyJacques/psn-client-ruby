@@ -46,5 +46,11 @@ RSpec.describe PSN::Paginator do
       expect(enum.first(1)).to eq([1])
       expect(calls).to eq(1)
     end
+
+    it "stops when the next cursor is an empty string" do
+      pages = { nil => [[1], "c1"], "c1" => [[2], ""] }
+      enum = described_class.cursor { |cursor| pages.fetch(cursor) }
+      expect(enum.to_a).to eq([1, 2])
+    end
   end
 end
