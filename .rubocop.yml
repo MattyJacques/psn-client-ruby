@@ -34,8 +34,6 @@ RSpec/ExampleLength:
 
 RSpec/MultipleExpectations:
   Max: 5
-  Exclude:
-    - "spec/psn_client/errors_spec.rb"
 
 RSpec/DescribeClass:
   Exclude:
