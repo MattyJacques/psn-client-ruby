@@ -13,6 +13,7 @@ require_relative "psn_client/models/trophy_summary"
 require_relative "psn_client/models/transaction"
 require_relative "psn_client/models/entitlement"
 require_relative "psn_client/resources/users"
+require_relative "psn_client/resources/games"
 
 # Unofficial PlayStation Network API client.
 module PSN
