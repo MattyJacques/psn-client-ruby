@@ -46,6 +46,6 @@ RSpec/SpecFilePathFormat:
     - "spec/psn_client/models/trophy_models_spec.rb"
 
 RSpec/MultipleExpectations:
-  Max: 8
+  Max: 5
   Exclude:
     - "spec/psn_client/models/**/*_spec.rb"
