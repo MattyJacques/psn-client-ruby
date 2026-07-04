@@ -23,6 +23,12 @@ RSpec.describe PSN::Paginator do
       expect(enum).to be_a(Enumerator::Lazy)
       expect(enum.to_a).to eq([])
     end
+
+    it "falls back to paging until an empty page when total is missing" do
+      pages = { 0 => [[1, 2], nil], 2 => [[3], nil], 3 => [[], nil] }
+      enum = described_class.offset(page_size: 2) { |_limit, offset| pages.fetch(offset) }
+      expect(enum.to_a).to eq([1, 2, 3])
+    end
   end
 
   describe ".cursor" do

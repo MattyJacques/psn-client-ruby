@@ -15,7 +15,7 @@ module PSN
           items, total = yield(page_size, position)
           items.each { |item| yielder << item }
           position += items.size
-          break if items.empty? || position >= total.to_i
+          break if items.empty? || (total && position >= total.to_i)
         end
       end.lazy
     end

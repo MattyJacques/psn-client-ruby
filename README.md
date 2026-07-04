@@ -9,6 +9,8 @@ trophies earned, transaction history and entitlements.
 gem "psn-client-ruby"
 ```
 
+Requires Ruby >= 3.2.
+
 ## Authentication
 
 PSN has no public API; this gem uses the same OAuth flow as the official
@@ -55,7 +57,9 @@ Amounts are integer minor units (`6999` + `"GBP"` = £69.99).
 
 All errors subclass `PSN::Error` (`#response` has status and body):
 `AuthenticationError`, `PrivacyError` (target account is private),
-`NotFoundError`, `RateLimitError` (`#retry_after`), `APIError`.
+`NotFoundError`, `RateLimitError` (`#retry_after`), `APIError`. Rate limits
+are not retried automatically: a 429 raises `RateLimitError` immediately
+with `#retry_after` so the caller decides when to retry.
 
 ## Development
 
