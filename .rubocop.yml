@@ -41,5 +41,7 @@ RSpec/DescribeClass:
     - "spec/psn_client/models/store_models_spec.rb"
 
 RSpec/SpecFilePathFormat:
+  CustomTransform:
+    PSN: psn_client
   Exclude:
     - "spec/psn_client/errors_spec.rb"
