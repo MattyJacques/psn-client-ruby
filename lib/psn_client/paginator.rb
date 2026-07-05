@@ -21,13 +21,16 @@ module PSN
     end
 
     # Sony cursor paging: response carries the next cursor (nil/empty = done).
+    # A cursor identical to the previous one also ends the walk — guards
+    # against a misbehaving API pinning the enumerator in an infinite loop.
     def cursor
       Enumerator.new do |yielder|
         next_cursor = nil
         loop do
+          previous_cursor = next_cursor
           items, next_cursor = yield(next_cursor)
           items.each { |item| yielder << item }
-          break if items.empty? || next_cursor.nil? || next_cursor.to_s.empty?
+          break if items.empty? || next_cursor.nil? || next_cursor.to_s.empty? || next_cursor == previous_cursor
         end
       end.lazy
     end

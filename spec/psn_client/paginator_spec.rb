@@ -58,5 +58,15 @@ RSpec.describe PSN::Paginator do
       enum = described_class.cursor { |cursor| pages.fetch(cursor) }
       expect(enum.to_a).to eq([1, 2])
     end
+
+    it "stops when the API repeats the same cursor instead of looping forever" do
+      calls = 0
+      enum = described_class.cursor do |_cursor|
+        calls += 1
+        [[calls], "stuck"]
+      end
+      expect(enum.to_a).to eq([1, 2])
+      expect(calls).to eq(2)
+    end
   end
 end
