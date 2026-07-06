@@ -2,6 +2,7 @@
 
 module PSN
   AVATAR_SIZE_ORDER = %w[xl l m s].freeze
+  private_constant :AVATAR_SIZE_ORDER
 
   Profile = Data.define(:online_id, :account_id, :avatar_url, :plus, :about_me, :languages,
                         :verified, :trophy_summary, :online, :platform, :last_online_at, :raw) do
@@ -29,7 +30,7 @@ module PSN
       return nil if urls.nil? || urls.empty?
 
       by_size = urls.to_h { |u| [u["size"], u["avatarUrl"]] }
-      PSN::AVATAR_SIZE_ORDER.filter_map { |size| by_size[size] }.first || urls.first["avatarUrl"]
+      AVATAR_SIZE_ORDER.filter_map { |size| by_size[size] }.first || urls.first["avatarUrl"]
     end
 
     def plus? = plus
