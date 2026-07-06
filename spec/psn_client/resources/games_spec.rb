@@ -34,7 +34,7 @@ RSpec.describe PSN::Resources::Games do
       response = { "data" => { "gameLibraryTitlesRetrieve" => { "games" => [fixture("library_title")] } } }
       allow(connection).to receive(:graphql)
         .with("getUserGameList",
-              { "categories" => "ps4_game,ps5_native_game", "limit" => 200 },
+              { "categories" => "ps4_game,ps5_native_game", "limit" => 100 },
               PSN::Resources::Games::LIBRARY_HASH)
         .and_return(response)
 

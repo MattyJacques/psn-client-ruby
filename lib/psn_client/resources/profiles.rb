@@ -12,7 +12,10 @@ module PSN
                         "trophySummary(@default,level,progress,earnedTrophies)," \
                         "isOfficiallyVerified,primaryOnlineStatus," \
                         "presences(@default,@titleInfo,platform,lastOnlineDate)"
-      ME_PATH = "/api/userProfile/v1/internal/users/me/profiles"
+      # The internal profiles endpoint rejects "me" as a path account ID
+      # (HTTP 400), so the own account ID comes from the DMS device API first.
+      ACCOUNT_ME_PATH = "/api/v1/devices/accounts/me"
+      PROFILE_BY_ACCOUNT_PATH = "/api/userProfile/v1/internal/users/%s/profiles"
       ONLINE_ID_PATTERN = /\A[a-zA-Z0-9_-]{3,16}\z/
 
       def initialize(connection)
@@ -29,7 +32,10 @@ module PSN
       private
 
       def own_online_id
-        @own_online_id ||= @connection.get(:mobile, ME_PATH, {})["onlineId"]
+        @own_online_id ||= begin
+          account_id = @connection.get(:dms, ACCOUNT_ME_PATH, {})["accountId"]
+          @connection.get(:mobile, format(PROFILE_BY_ACCOUNT_PATH, account_id), {})["onlineId"]
+        end
       end
 
       def validate_online_id!(online_id)

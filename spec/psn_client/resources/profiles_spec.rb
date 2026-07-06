@@ -17,17 +17,18 @@ RSpec.describe PSN::Resources::Profiles do
     expect(profile.account_id).to eq("1234567890123456789")
   end
 
-  it "resolves and memoizes the own online ID for the authenticated account" do
+  it "resolves and memoizes the own online ID via account ID for the authenticated account" do
+    allow(connection).to receive(:get).with(:dms, "/api/v1/devices/accounts/me", {})
+                                      .and_return({ "accountId" => "7077443169688056897" })
     allow(connection).to receive(:get)
-      .with(:mobile, "/api/userProfile/v1/internal/users/me/profiles", {})
+      .with(:mobile, "/api/userProfile/v1/internal/users/7077443169688056897/profiles", {})
       .and_return({ "onlineId" => "MattyJ" })
     allow(connection).to receive(:get)
       .with(:community, "/userProfile/v1/users/MattyJ/profile2", anything)
       .and_return({ "profile" => fixture("profile") })
 
     2.times { expect(profiles.find.online_id).to eq("MattyJ") }
-    expect(connection).to have_received(:get)
-      .with(:mobile, "/api/userProfile/v1/internal/users/me/profiles", {}).once
+    expect(connection).to have_received(:get).with(:dms, "/api/v1/devices/accounts/me", {}).once
     expect(connection).to have_received(:get)
       .with(:community, "/userProfile/v1/users/MattyJ/profile2", anything).twice
   end

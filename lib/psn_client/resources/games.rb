@@ -11,7 +11,9 @@ module PSN
       LIBRARY_OPERATION = "getUserGameList"
       LIBRARY_HASH = "e0136f81d7d1fb6be58238c574e9a46e1c0cc2f7f6977a08a5a46f224523a004"
       LIBRARY_CATEGORIES = "ps4_game,ps5_native_game"
-      LIBRARY_LIMIT = 200
+      # The API rejects limits above 100 with a GraphQL Argument Validation
+      # Error (verified live: 100 works, 101 does not).
+      LIBRARY_LIMIT = 100
       PURCHASED_OPERATION = "getPurchasedGameList"
       PURCHASED_HASH = "827a423f6a8ddca4107ac01395af2ec0eafd8396fc7fa204aaf9b7ed2eefa168"
       PURCHASED_PAGE_SIZE = 200
