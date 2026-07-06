@@ -44,5 +44,33 @@ section("5 entitlements") do
   client.store.entitlements.first(5).each { |e| puts "#{e.name} [#{e.platform}] #{e.acquired_at}" }
 end
 
+section("Profile") do
+  p = client.profiles.find
+  puts "#{p.online_id} plus=#{p.plus?} level=#{p.trophy_summary&.level} avatar=#{p.avatar_url}"
+end
+
+section("5 library titles") do
+  client.games.library.first(5).each { |g| puts "#{g.name} [#{g.platform}] sub=#{g.subscription_service || '-'}" }
+end
+
+section("5 purchased games") do
+  client.games.purchased.first(5).each { |g| puts "#{g.name} [#{g.platform}] downloadable=#{g.downloadable?}" }
+end
+
+section("Trophy title summary for 2 recent games") do
+  ids = client.games.played.first(2).map(&:title_id)
+  client.trophies.title_summary(title_ids: ids).each do |s|
+    s.trophy_titles.each { |t| puts "#{s.np_title_id}: #{t.name} #{t.progress}%" }
+  end
+end
+
+section("Trophy groups for most recent trophy title") do
+  title = client.trophies.titles.first(1).first
+  client.trophies.groups(np_communication_id: title.np_communication_id,
+                         platform: title.platform).each do |g|
+    puts "#{g.group_id}: #{g.name} #{g.progress}%"
+  end
+end
+
 puts "\nRefresh token (persist for next session):"
 puts client.refresh_token

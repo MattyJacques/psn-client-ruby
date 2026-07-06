@@ -40,16 +40,32 @@ untouched API response.
 client.games.played.first(10).each { |g| puts "#{g.name} [#{g.platform}]" }
 client.games.played("a_friend").to_a
 
+# Game library and purchases (authenticated account only, GraphQL)
+client.games.library.to_a                 # owned + subscription titles
+client.games.purchased.first(20)          # games-only storefront view
+
+# Profiles
+client.profiles.find                      # authenticated account
+client.profiles.find("a_friend")          # avatar, PS Plus, presence, trophy level
+
 # Trophies
 client.trophies.summary                                  # level, counts
 client.trophies.titles.to_a                              # per-game progress
 client.trophies.earned(np_communication_id: "NPWR20188_00")
 client.trophies.earned("a_friend", np_communication_id: "NPWR00000_00", platform: "PS4")
+client.trophies.title_summary(title_ids: %w[PPSA01325_00 CUSA13323_00])
+client.trophies.groups(np_communication_id: "NPWR20188_00")  # base game vs DLC
 
 # Purchases (authenticated account only)
 client.store.transactions.first(20)  # orders, refunds, wallet funding
 client.store.entitlements.to_a       # everything owned incl. free claims
 ```
+
+`games.purchased` and `store.entitlements` overlap but answer different
+questions: `purchased` is the games-only library view (artwork,
+`downloadable?`, `pre_order?`), `entitlements` is the complete ownership
+ledger down to DLC and free claims, and `transactions` is the only source
+of monetary data.
 
 Amounts are integer minor units (`6999` + `"GBP"` = £69.99).
 
@@ -69,8 +85,10 @@ bundle exec rake        # rspec + rubocop
 ruby bin/smoke          # live-API check; needs PSN_NPSSO or PSN_REFRESH_TOKEN
 ```
 
-Note: the transaction/entitlement endpoints are undocumented and may change;
-they live in `lib/psn_client/resources/store.rb` if they need updating.
+Note: the transaction/entitlement endpoints, the GraphQL persisted queries
+and the legacy profile endpoint are undocumented and may change; they live
+in `lib/psn_client/resources/store.rb`, `lib/psn_client/resources/games.rb`
+and `lib/psn_client/resources/profiles.rb` if they need updating.
 
 ## License
 
