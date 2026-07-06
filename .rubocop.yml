@@ -44,6 +44,7 @@ RSpec/SpecFilePathFormat:
   Exclude:
     - "spec/psn_client/errors_spec.rb"
     - "spec/psn_client/models/game_title_spec.rb"
+    - "spec/psn_client/models/profile_spec.rb"
     - "spec/psn_client/models/trophy_models_spec.rb"
     - "spec/psn_client/models/library_models_spec.rb"
 

@@ -1,0 +1,23 @@
+{
+  "onlineId": "MattyJ",
+  "accountId": "1234567890123456789",
+  "npId": "TWF0dHlK@b6.gb",
+  "avatarUrls": [
+    { "size": "m", "avatarUrl": "https://static-resource.np.community.playstation.net/avatar_m.png" },
+    { "size": "l", "avatarUrl": "https://static-resource.np.community.playstation.net/avatar_l.png" }
+  ],
+  "plus": 1,
+  "aboutMe": "Backlog wrangler",
+  "languagesUsed": ["en"],
+  "trophySummary": {
+    "level": 421,
+    "progress": 37,
+    "earnedTrophies": { "platinum": 12, "gold": 89, "silver": 320, "bronze": 1204 }
+  },
+  "isOfficiallyVerified": false,
+  "personalDetailSharing": "no",
+  "primaryOnlineStatus": "offline",
+  "presences": [
+    { "onlineStatus": "offline", "platform": "PS5", "lastOnlineDate": "2026-07-05T22:14:00.000Z" }
+  ]
+}

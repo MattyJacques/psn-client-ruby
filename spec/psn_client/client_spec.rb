@@ -16,6 +16,7 @@ RSpec.describe PSN::Client do
     expect(client.games).to be_a(PSN::Resources::Games)
     expect(client.trophies).to be_a(PSN::Resources::Trophies)
     expect(client.store).to be_a(PSN::Resources::Store)
+    expect(client.profiles).to be_a(PSN::Resources::Profiles)
     expect(client.games).to equal(client.games)
   end
 

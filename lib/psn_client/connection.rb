@@ -10,7 +10,8 @@ module PSN
   class Connection
     HOSTS = {
       mobile: "https://m.np.playstation.com",
-      web: "https://web.np.playstation.com"
+      web: "https://web.np.playstation.com",
+      community: "https://us-prof.np.community.playstation.net"
     }.freeze
 
     DEFAULT_RETRY_OPTIONS = {
