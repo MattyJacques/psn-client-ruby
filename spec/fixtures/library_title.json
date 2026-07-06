@@ -1,0 +1,13 @@
+{
+  "__typename": "GameLibraryTitle",
+  "conceptId": "10000237",
+  "entitlementId": "LIB-ENTITLEMENT-1",
+  "image": { "__typename": "Media", "url": "https://image.api.playstation.com/astro.png" },
+  "isActive": true,
+  "lastPlayedDateTime": "2026-06-30T18:00:00.000Z",
+  "name": "ASTRO's PLAYROOM",
+  "platform": "PS5",
+  "productId": "UP9000-PPSA01325_00-0000000000000000",
+  "subscriptionService": "NONE",
+  "titleId": "PPSA01325_00"
+}

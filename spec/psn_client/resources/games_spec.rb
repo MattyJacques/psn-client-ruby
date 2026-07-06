@@ -28,4 +28,29 @@ RSpec.describe PSN::Resources::Games do
     expect(games.played("friend").first(3).size).to eq(3)
     expect(connection).to have_received(:get).once # second page never requested
   end
+
+  describe "#library" do
+    it "fetches the game library via the getUserGameList persisted query" do
+      response = { "data" => { "gameLibraryTitlesRetrieve" => { "games" => [fixture("library_title")] } } }
+      allow(connection).to receive(:graphql)
+        .with("getUserGameList",
+              { "categories" => "ps4_game,ps5_native_game", "limit" => 200 },
+              PSN::Resources::Games::LIBRARY_HASH)
+        .and_return(response)
+
+      result = games.library.to_a
+      expect(result.size).to eq(1)
+      expect(result.first).to be_a(PSN::LibraryTitle)
+      expect(result.first.name).to eq("ASTRO's PLAYROOM")
+    end
+
+    it "passes a custom limit and returns a lazy enumerator" do
+      allow(connection).to receive(:graphql)
+        .with("getUserGameList", hash_including("limit" => 5), PSN::Resources::Games::LIBRARY_HASH)
+        .and_return({ "data" => { "gameLibraryTitlesRetrieve" => { "games" => [] } } })
+
+      expect(games.library(limit: 5)).to be_a(Enumerator::Lazy)
+      expect(games.library(limit: 5).to_a).to eq([])
+    end
+  end
 end

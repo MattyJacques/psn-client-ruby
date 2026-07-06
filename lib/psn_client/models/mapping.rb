@@ -37,5 +37,11 @@ module PSN
     def platform(category)
       GAME_PLATFORMS.fetch(category, category)
     end
+
+    # "NONE" means a regular owned title -> nil; real services ("PS_PLUS", ...)
+    # pass through unchanged.
+    def subscription(value)
+      value == "NONE" ? nil : value
+    end
   end
 end
