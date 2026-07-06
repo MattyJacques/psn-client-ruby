@@ -60,4 +60,39 @@ RSpec.describe PSN::Connection do
     expect { connection.get(:mobile, "/api/test") }
       .to raise_error(PSN::APIError) { |e| expect(e.response[:status]).to eq(500) }
   end
+
+  describe "#graphql" do
+    let(:gql_url) { "https://m.np.playstation.com/api/graphql/v1/op" }
+
+    it "performs a persisted-query GET with the Apollo preflight header" do
+      stub_request(:get, gql_url)
+        .with(query: {
+                "operationName" => "getThing",
+                "variables" => '{"limit":5}',
+                "extensions" => '{"persistedQuery":{"version":1,"sha256Hash":"abc123"}}'
+              },
+              headers: { "Authorization" => "Bearer tok-1", "Apollo-Require-Preflight" => "true" })
+        .to_return(json_response({ "data" => { "ok" => true } }))
+
+      expect(connection.graphql("getThing", { "limit" => 5 }, "abc123")).to eq("data" => { "ok" => true })
+    end
+
+    it "raises APIError when the 200 body carries GraphQL errors" do
+      stub_request(:get, gql_url)
+        .with(query: hash_including("operationName" => "getThing"))
+        .to_return(json_response({ "errors" => [{ "message" => "PersistedQueryNotFound" }] }))
+
+      expect { connection.graphql("getThing", {}, "abc123") }
+        .to raise_error(PSN::APIError, /PersistedQueryNotFound/)
+    end
+
+    it "refreshes and retries once on 401" do
+      stub_request(:get, gql_url)
+        .with(query: hash_including("operationName" => "getThing"))
+        .to_return({ status: 401 }, json_response({ "data" => { "ok" => true } }))
+
+      expect(connection.graphql("getThing", {}, "abc123")).to eq("data" => { "ok" => true })
+      expect(auth).to have_received(:refresh!).once
+    end
+  end
 end

@@ -2,6 +2,7 @@
 
 require "faraday"
 require "faraday/retry"
+require "json"
 
 module PSN
   # Shared HTTP layer: one Faraday connection per PSN host, Bearer auth
@@ -20,6 +21,9 @@ module PSN
       methods: %i[get post]
     }.freeze
 
+    GRAPHQL_PATH = "/api/graphql/v1/op"
+    GRAPHQL_HEADERS = { "Apollo-Require-Preflight" => "true" }.freeze
+
     def initialize(auth, retry_options: nil)
       @auth = auth
       @retry_options = DEFAULT_RETRY_OPTIONS.merge(retry_options || {})
@@ -34,21 +38,34 @@ module PSN
       request(host, :post, path, body)
     end
 
+    # Persisted-query GraphQL GET. Sony's GraphQL can fail with HTTP 200 and
+    # an errors array in the body, so that case is mapped to APIError here.
+    def graphql(operation_name, variables, sha256_hash)
+      extensions = { "persistedQuery" => { "version" => 1, "sha256Hash" => sha256_hash } }
+      params = { "operationName" => operation_name,
+                 "variables" => JSON.generate(variables),
+                 "extensions" => JSON.generate(extensions) }
+      body = request(:mobile, :get, GRAPHQL_PATH, params, headers: GRAPHQL_HEADERS)
+      handle_graphql_errors(body)
+      body
+    end
+
     private
 
-    def request(host, verb, path, payload, retried: false)
-      resp = perform(host, verb, path, payload)
+    def request(host, verb, path, payload, headers: {}, retried: false) # rubocop:disable Metrics/ParameterLists
+      resp = perform(host, verb, path, payload, headers)
       if resp.status == 401 && !retried
         @auth.refresh!
-        return request(host, verb, path, payload, retried: true)
+        return request(host, verb, path, payload, headers: headers, retried: true)
       end
       handle_errors(resp)
       resp.body
     end
 
-    def perform(host, verb, path, payload)
+    def perform(host, verb, path, payload, headers)
       connection(host).public_send(verb, path) do |req|
         req.headers["Authorization"] = "Bearer #{@auth.access_token}"
+        headers.each { |name, value| req.headers[name] = value }
         verb == :get ? req.params.update(payload) : req.body = payload
       end
     end
@@ -65,6 +82,14 @@ module PSN
                                                              retry_after: resp.headers["retry-after"]&.to_i)
       else raise APIError.new("PSN API error (HTTP #{resp.status})", response: response)
       end
+    end
+
+    def handle_graphql_errors(body)
+      errors = body.is_a?(Hash) ? body["errors"] : nil
+      return if errors.nil? || errors.empty?
+
+      messages = errors.filter_map { |e| e["message"] }.join("; ")
+      raise APIError.new("PSN GraphQL error: #{messages}", response: { status: 200, body: body })
     end
 
     def connection(host)
