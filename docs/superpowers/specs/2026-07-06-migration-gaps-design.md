@@ -97,7 +97,8 @@ defaulting to the authenticated account; keywords for the rest):
 - `trophies.groups(online_id = nil, np_communication_id:, platform: nil)` —
   wraps the `trophyGroups` definition + earned endpoints, merged the same way
   `earned` merges trophies. Returns `TrophyGroup` models: `group_id`, `name`,
-  `icon_url`, `defined_trophies`, `earned_trophies`, `progress`. Base game is
+  `icon_url`, `defined_counts`, `earned_counts`, `progress` (count naming
+  matches the existing `TrophyTitle`/`TrophySummary` models). Base game is
   group `"default"`, DLC packs `"001"`, `"002"`, … Same `platform:` handling
   as `earned` (`npServiceName=trophy` for pre-PS5 titles).
 - No single-trophy method: `earned` already returns every trophy for a title
