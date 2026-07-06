@@ -8,6 +8,8 @@ module PSN
       DEFINITIONS_PATH = "/api/trophy/v1/npCommunicationIds/%s/trophyGroups/all/trophies"
       EARNED_PATH = "/api/trophy/v1/users/%s/npCommunicationIds/%s/trophyGroups/all/trophies"
       PAGE_SIZE = 100
+      TITLE_SUMMARY_PATH = "/api/trophy/v1/users/%s/titles/trophyTitles"
+      TITLE_IDS_PER_REQUEST = 5
 
       def initialize(connection, users)
         @connection = connection
@@ -27,6 +29,17 @@ module PSN
       def summary(online_id = nil)
         account_id = @users.account_id(online_id)
         TrophySummary.from_api(@connection.get(:mobile, format(SUMMARY_PATH, account_id), {}))
+      end
+
+      # Trophy progress for specific title IDs (CUSA/PPSA...). The API caps
+      # each request at 5 IDs, so larger lists are fetched in lazy batches.
+      def title_summary(online_id = nil, title_ids:)
+        account_id = @users.account_id(online_id)
+        title_ids.each_slice(TITLE_IDS_PER_REQUEST).lazy.flat_map do |batch|
+          response = @connection.get(:mobile, format(TITLE_SUMMARY_PATH, account_id),
+                                     { "npTitleIds" => batch.join(",") })
+          (response["titles"] || []).map { |title| TitleTrophySummary.from_api(title) }
+        end
       end
 
       # All trophies for one title, each merged with the user's earned status.

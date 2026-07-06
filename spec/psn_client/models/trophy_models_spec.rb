@@ -46,4 +46,21 @@ RSpec.describe "trophy models" do
       expect(summary.earned_counts).to eq(bronze: 800, silver: 400, gold: 100, platinum: 10)
     end
   end
+
+  describe PSN::TitleTrophySummary do
+    subject(:summary) { described_class.from_api(fixture("title_trophy_summary")) }
+
+    it "maps the title ID and nested trophy titles" do
+      expect(summary.np_title_id).to eq("PPSA01325_00")
+      expect(summary.trophy_titles.size).to eq(1)
+      expect(summary.trophy_titles.first).to be_a(PSN::TrophyTitle)
+      expect(summary.trophy_titles.first.np_communication_id).to eq("NPWR20188_00")
+      expect(summary.trophy_titles.first.progress).to eq(71)
+    end
+
+    it "maps a title with no trophy sets to an empty array" do
+      none = described_class.from_api(fixture("title_trophy_summary").merge("trophyTitles" => []))
+      expect(none.trophy_titles).to eq([])
+    end
+  end
 end
