@@ -1,0 +1,14 @@
+{
+  "__typename": "PurchasedGame",
+  "conceptId": "232076",
+  "entitlementId": "PUR-ENTITLEMENT-1",
+  "image": { "__typename": "Media", "url": "https://image.api.playstation.com/ghost.png" },
+  "isActive": true,
+  "isDownloadable": true,
+  "isPreOrder": false,
+  "membership": "NONE",
+  "name": "Ghost of Tsushima",
+  "platform": "PS4",
+  "productId": "EP9000-CUSA13323_00-GHOSTSHIP0000000",
+  "titleId": "CUSA13323_00"
+}

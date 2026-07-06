@@ -53,4 +53,38 @@ RSpec.describe PSN::Resources::Games do
       expect(games.library(limit: 5).to_a).to eq([])
     end
   end
+
+  describe "#purchased" do
+    def purchased_response(games_page)
+      { "data" => { "purchasedTitlesRetrieve" => { "games" => games_page } } }
+    end
+
+    it "pages via start/size until an empty page (no total in the response)" do
+      allow(connection).to receive(:graphql)
+        .with("getPurchasedGameList", hash_including("size" => 200, "start" => 0),
+              PSN::Resources::Games::PURCHASED_HASH)
+        .and_return(purchased_response(Array.new(200) { fixture("purchased_game") }))
+      allow(connection).to receive(:graphql)
+        .with("getPurchasedGameList", hash_including("start" => 200),
+              PSN::Resources::Games::PURCHASED_HASH)
+        .and_return(purchased_response([]))
+
+      result = games.purchased.to_a
+      expect(result.size).to eq(200)
+      expect(result.first).to be_a(PSN::PurchasedGame)
+      expect(connection).to have_received(:graphql).twice
+    end
+
+    it "is lazy: .first(n) stops after the first page" do
+      allow(connection).to receive(:graphql)
+        .with("getPurchasedGameList",
+              { "isActive" => true, "platform" => %w[ps4 ps5], "sortBy" => "ACTIVE_DATE",
+                "sortDirection" => "desc", "size" => 200, "start" => 0 },
+              PSN::Resources::Games::PURCHASED_HASH)
+        .and_return(purchased_response(Array.new(200) { fixture("purchased_game") }))
+
+      expect(games.purchased.first(3).size).to eq(3)
+      expect(connection).to have_received(:graphql).once
+    end
+  end
 end

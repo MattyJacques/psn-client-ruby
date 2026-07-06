@@ -12,6 +12,11 @@ module PSN
       LIBRARY_HASH = "e0136f81d7d1fb6be58238c574e9a46e1c0cc2f7f6977a08a5a46f224523a004"
       LIBRARY_CATEGORIES = "ps4_game,ps5_native_game"
       LIBRARY_LIMIT = 200
+      PURCHASED_OPERATION = "getPurchasedGameList"
+      PURCHASED_HASH = "827a423f6a8ddca4107ac01395af2ec0eafd8396fc7fa204aaf9b7ed2eefa168"
+      PURCHASED_PAGE_SIZE = 200
+      PURCHASED_VARIABLES = { "isActive" => true, "platform" => %w[ps4 ps5],
+                              "sortBy" => "ACTIVE_DATE", "sortDirection" => "desc" }.freeze
 
       def initialize(connection, users)
         @connection = connection
@@ -37,6 +42,20 @@ module PSN
                                        LIBRARY_HASH)
         titles = response.dig("data", "gameLibraryTitlesRetrieve", "games") || []
         titles.lazy.map { |title| LibraryTitle.from_api(title) }
+      end
+
+      # Purchased games for the authenticated account: the games-only
+      # storefront view. store.entitlements is the full ownership ledger.
+      # The persisted query returns no total count, so pages are fetched
+      # until an empty one comes back.
+      def purchased
+        paginator = Paginator.offset(page_size: PURCHASED_PAGE_SIZE) do |size, start|
+          response = @connection.graphql(PURCHASED_OPERATION,
+                                         PURCHASED_VARIABLES.merge("size" => size, "start" => start),
+                                         PURCHASED_HASH)
+          [response.dig("data", "purchasedTitlesRetrieve", "games") || [], nil]
+        end
+        paginator.map { |game| PurchasedGame.from_api(game) }
       end
     end
   end
