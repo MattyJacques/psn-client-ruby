@@ -1,0 +1,6 @@
+{
+  "trophyGroupId": "default",
+  "trophyGroupName": "ASTRO's PLAYROOM",
+  "trophyGroupIconUrl": "https://psnobj.prod.dl.playstation.net/psnobj/NPWR20188_00/group_default.png",
+  "definedTrophies": { "bronze": 24, "silver": 12, "gold": 6, "platinum": 1 }
+}

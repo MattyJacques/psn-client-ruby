@@ -100,4 +100,37 @@ RSpec.describe PSN::Resources::Trophies do
       expect(connection).to have_received(:get).once # second batch never requested
     end
   end
+
+  describe "#groups" do
+    it "merges group definitions with the account's earned progress" do
+      allow(users).to receive(:account_id).with(nil).and_return("me")
+      allow(connection).to receive(:get)
+        .with(:mobile, "/api/trophy/v1/npCommunicationIds/NPWR20188_00/trophyGroups", {})
+        .and_return({ "trophyGroups" => [fixture("trophy_group_definition")] })
+      allow(connection).to receive(:get)
+        .with(:mobile, "/api/trophy/v1/users/me/npCommunicationIds/NPWR20188_00/trophyGroups", {})
+        .and_return({ "trophyGroups" => [fixture("trophy_group_earned")] })
+
+      result = trophies.groups(np_communication_id: "NPWR20188_00").to_a
+      expect(result.size).to eq(1)
+      expect(result.first).to be_a(PSN::TrophyGroup)
+      expect(result.first.progress).to eq(83)
+      expect(result.first.defined_counts).to eq(bronze: 24, silver: 12, gold: 6, platinum: 1)
+    end
+
+    it "sends npServiceName=trophy for pre-PS5 platforms" do
+      allow(users).to receive(:account_id).with(nil).and_return("me")
+      allow(connection).to receive(:get)
+        .with(:mobile, "/api/trophy/v1/npCommunicationIds/NPWR00001_00/trophyGroups",
+              { "npServiceName" => "trophy" })
+        .and_return({ "trophyGroups" => [fixture("trophy_group_definition")] })
+      allow(connection).to receive(:get)
+        .with(:mobile, "/api/trophy/v1/users/me/npCommunicationIds/NPWR00001_00/trophyGroups",
+              { "npServiceName" => "trophy" })
+        .and_return({ "trophyGroups" => [] })
+
+      result = trophies.groups(np_communication_id: "NPWR00001_00", platform: "PS4").to_a
+      expect(result.first.earned_counts).to be_nil
+    end
+  end
 end

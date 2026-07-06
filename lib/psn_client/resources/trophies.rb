@@ -10,6 +10,8 @@ module PSN
       PAGE_SIZE = 100
       TITLE_SUMMARY_PATH = "/api/trophy/v1/users/%s/titles/trophyTitles"
       TITLE_IDS_PER_REQUEST = 5
+      GROUPS_DEFINITIONS_PATH = "/api/trophy/v1/npCommunicationIds/%s/trophyGroups"
+      GROUPS_EARNED_PATH = "/api/trophy/v1/users/%s/npCommunicationIds/%s/trophyGroups"
 
       def initialize(connection, users)
         @connection = connection
@@ -51,6 +53,16 @@ module PSN
         merge(definitions["trophies"] || [], earned["trophies"] || []).lazy
       end
 
+      # Trophy groups for one title (base game is "default", DLC packs are
+      # "001", "002", ...), each merged with the account's progress.
+      def groups(online_id = nil, np_communication_id:, platform: nil)
+        account_id = @users.account_id(online_id)
+        params = service_params(platform)
+        definitions = @connection.get(:mobile, format(GROUPS_DEFINITIONS_PATH, np_communication_id), params)
+        earned = @connection.get(:mobile, format(GROUPS_EARNED_PATH, account_id, np_communication_id), params)
+        merge_groups(definitions["trophyGroups"] || [], earned["trophyGroups"] || []).lazy
+      end
+
       private
 
       # PS5 titles use the default trophy2 service; everything older needs
@@ -64,6 +76,11 @@ module PSN
       def merge(definitions, earned)
         earned_by_id = earned.to_h { |t| [t["trophyId"], t] }
         definitions.map { |d| Trophy.from_api(d.merge(earned_by_id[d["trophyId"]] || {})) }
+      end
+
+      def merge_groups(definitions, earned)
+        earned_by_id = earned.to_h { |g| [g["trophyGroupId"], g] }
+        definitions.map { |d| TrophyGroup.from_api(d.merge(earned_by_id[d["trophyGroupId"]] || {})) }
       end
     end
   end

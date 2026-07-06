@@ -63,4 +63,25 @@ RSpec.describe "trophy models" do
       expect(none.trophy_titles).to eq([])
     end
   end
+
+  describe PSN::TrophyGroup do
+    subject(:group) do
+      described_class.from_api(fixture("trophy_group_definition").merge(fixture("trophy_group_earned")))
+    end
+
+    it "maps merged definition and earned fields" do
+      expect(group.group_id).to eq("default")
+      expect(group.name).to eq("ASTRO's PLAYROOM")
+      expect(group.icon_url).to match(%r{^https://})
+      expect(group.defined_counts).to eq(bronze: 24, silver: 12, gold: 6, platinum: 1)
+      expect(group.earned_counts).to eq(bronze: 20, silver: 8, gold: 2, platinum: 0)
+      expect(group.progress).to eq(83)
+    end
+
+    it "leaves earned fields nil when only the definition is present" do
+      definition_only = described_class.from_api(fixture("trophy_group_definition"))
+      expect(definition_only.earned_counts).to be_nil
+      expect(definition_only.progress).to be_nil
+    end
+  end
 end
