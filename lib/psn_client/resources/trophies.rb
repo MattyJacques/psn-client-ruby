@@ -7,6 +7,9 @@ module PSN
       SUMMARY_PATH = "/api/trophy/v1/users/%s/trophySummary"
       DEFINITIONS_PATH = "/api/trophy/v1/npCommunicationIds/%s/trophyGroups/all/trophies"
       EARNED_PATH = "/api/trophy/v1/users/%s/npCommunicationIds/%s/trophyGroups/all/trophies"
+      # trophyTitles caps limit at 800 (verified live: 800 works, 801 returns
+      # HTTP 400); this page size is well under the maximum to keep lazy reads
+      # (e.g. .first(n)) from over-fetching.
       PAGE_SIZE = 100
       TITLE_SUMMARY_PATH = "/api/trophy/v1/users/%s/titles/trophyTitles"
       TITLE_IDS_PER_REQUEST = 5
