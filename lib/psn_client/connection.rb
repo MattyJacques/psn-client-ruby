@@ -78,12 +78,36 @@ module PSN
       response = { status: resp.status, body: resp.body }
       case resp.status
       when 401 then raise AuthenticationError.new("unauthorized", response: response)
-      when 403 then raise PrivacyError.new("blocked by the account's privacy settings", response: response)
+      when 403 then raise forbidden_error(resp, response)
       when 404 then raise NotFoundError.new("not found", response: response)
       when 429 then raise RateLimitError.new("rate limited", response: response,
                                                              retry_after: resp.headers["retry-after"]&.to_i)
       else raise APIError.new("PSN API error (HTTP #{resp.status})", response: response)
       end
+    end
+
+    # A 403 is either a real API refusal (JSON body) or an edge/WAF block that
+    # never reached the API (HTML body). Only a genuine access-control refusal
+    # is a PrivacyError; other API 403s (e.g. missing scope) are plain APIError;
+    # a non-JSON body is an AccessDeniedError.
+    def forbidden_error(resp, response)
+      message = api_error_message(resp.body)
+      if message.nil?
+        return AccessDeniedError.new(
+          "request blocked before reaching the PSN API (HTTP 403, non-JSON response) — " \
+          "this endpoint likely requires a browser web session", response: response
+        )
+      end
+
+      klass = message.match?(/access control|privacy/i) ? PrivacyError : APIError
+      klass.new(message, response: response)
+    end
+
+    def api_error_message(body)
+      return nil unless body.is_a?(Hash)
+
+      error = body["error"]
+      error.is_a?(Hash) ? error["message"] : error
     end
 
     def handle_graphql_errors(body)

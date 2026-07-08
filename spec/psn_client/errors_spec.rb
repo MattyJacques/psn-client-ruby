@@ -12,6 +12,7 @@ RSpec.describe PSN::Error do
     expect(PSN::AuthenticationError.ancestors).to include(described_class)
     expect(PSN::NotFoundError.ancestors).to include(described_class)
     expect(PSN::APIError.ancestors).to include(described_class)
+    expect(PSN::AccessDeniedError.ancestors).to include(described_class)
   end
 
   it "carries retry_after on RateLimitError" do

@@ -39,9 +39,33 @@ RSpec.describe PSN::Connection do
     expect(auth).to have_received(:refresh!).once
   end
 
-  it "maps 403 to PrivacyError" do
-    stub_request(:get, url).to_return(status: 403)
-    expect { connection.get(:mobile, "/api/test") }.to raise_error(PSN::PrivacyError)
+  # A 403 has two very different causes: a real PSN API refusal (JSON body) or
+  # an Akamai/WAF edge block that never reached the API (HTML body). They must
+  # not share an error class or message.
+  it "maps a JSON access-control 403 to PrivacyError carrying the server message" do
+    stub_request(:get, url)
+      .to_return(json_response({ "error" => { "message" => "Not permitted by access control" } }, status: 403))
+    expect { connection.get(:mobile, "/api/test") }
+      .to raise_error(PSN::PrivacyError, /access control/i)
+  end
+
+  it "maps a JSON non-privacy 403 (e.g. missing scope) to APIError with the real message" do
+    stub_request(:get, url)
+      .to_return(json_response({ "error" => { "message" => "access token does not contain the required scope(s)" } }, status: 403))
+    expect { connection.get(:mobile, "/api/test") }
+      .to raise_error(PSN::APIError, /required scope/i)
+  end
+
+  it "maps a non-JSON 403 edge/WAF block to AccessDeniedError, never PrivacyError" do
+    stub_request(:get, url)
+      .to_return(status: 403, body: "<HTML><HEAD><TITLE>Access Denied</TITLE></HEAD><BODY>Access Denied</BODY></HTML>",
+                 headers: { "Content-Type" => "text/html" })
+    expect { connection.get(:mobile, "/api/test") }
+      .to raise_error(PSN::AccessDeniedError) { |e|
+        expect(e).not_to be_a(PSN::PrivacyError)
+        expect(e.message).not_to match(/privacy/i)
+        expect(e.response[:status]).to eq(403)
+      }
   end
 
   it "maps 404 to NotFoundError" do
