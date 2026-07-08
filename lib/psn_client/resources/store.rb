@@ -12,6 +12,11 @@ module PSN
       ENTITLEMENTS_HOST = :web
       ENTITLEMENTS_PATH = "/api/entitlements/v2/users/me/internal_entitlements"
       PAGE_SIZE = 50
+      # metGetStoreWishlist persisted query. Sony can change hash and shape
+      # at any time; verify with bin/smoke. Takes no variables — the whole
+      # wishlist comes back in one request, so there is no paging.
+      WISHLIST_OPERATION = "metGetStoreWishlist"
+      WISHLIST_HASH = "571149e8aa4d76af7dd33b92e1d6f8f828ebc5fa8f0f6bf51a8324a0e6d71324"
 
       def initialize(connection)
         @connection = connection
@@ -36,6 +41,14 @@ module PSN
           [response["entitlements"] || [], response["total_results"]]
         end
         paginator.map { |e| Entitlement.from_api(e) }
+      end
+
+      # The store wishlist: released products with prices and unreleased
+      # concepts alike (check #concept? — concepts have no price).
+      def wishlist
+        response = @connection.graphql(WISHLIST_OPERATION, {}, WISHLIST_HASH)
+        items = response.dig("data", "storeWishlist") || []
+        items.lazy.map { |item| WishlistItem.from_api(item) }
       end
     end
   end

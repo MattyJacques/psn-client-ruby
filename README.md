@@ -56,9 +56,10 @@ client.trophies.earned("a_friend", np_communication_id: "NPWR00000_00", platform
 client.trophies.title_summary(title_ids: %w[PPSA01325_00 CUSA13323_00])
 client.trophies.groups(np_communication_id: "NPWR20188_00")  # base game vs DLC
 
-# Purchases (authenticated account only)
+# Purchases and wishlist (authenticated account only)
 client.store.transactions.first(20)  # orders, refunds, wallet funding
 client.store.entitlements.to_a       # everything owned incl. free claims
+client.store.wishlist.to_a           # store wishlist incl. unreleased concepts
 ```
 
 `games.purchased` and `store.entitlements` overlap but answer different
