@@ -51,7 +51,8 @@ RSpec.describe PSN::Connection do
 
   it "maps a JSON non-privacy 403 (e.g. missing scope) to APIError with the real message" do
     stub_request(:get, url)
-      .to_return(json_response({ "error" => { "message" => "access token does not contain the required scope(s)" } }, status: 403))
+      .to_return(json_response({ "error" => { "message" => "access token does not contain the required scope(s)" } },
+                               status: 403))
     expect { connection.get(:mobile, "/api/test") }
       .to raise_error(PSN::APIError, /required scope/i)
   end
