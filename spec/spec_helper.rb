@@ -1,5 +1,12 @@
 # frozen_string_literal: true
 
+require "simplecov"
+SimpleCov.start do
+  add_filter "/spec/"
+  enable_coverage :branch
+  minimum_coverage line: 99, branch: 85
+end
+
 require "psn_client"
 require "webmock/rspec"
 require "json"
