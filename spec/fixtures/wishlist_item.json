@@ -1,0 +1,32 @@
+{
+  "__typename": "Product",
+  "boxArt": {
+    "__typename": "Media",
+    "url": "https://image.api.playstation.com/vulcan/ap/rnd/202205/1307/QpeOEfRcYvTWs6oU7vwePeWK.png"
+  },
+  "id": "UP0102-PPSA07813_00-CLASSICRE2000001",
+  "localizedStoreDisplayClassification": "Full Game",
+  "name": "Resident Evil 2",
+  "platforms": [
+    "PS4",
+    "PS5"
+  ],
+  "price": {
+    "__typename": "SkuPrice",
+    "basePrice": "£7.99",
+    "discountText": null,
+    "discountedPrice": "Included",
+    "isExclusive": false,
+    "isFree": true,
+    "isTiedToSubscription": true,
+    "serviceBranding": [
+      "PS_PLUS"
+    ],
+    "skuId": "UP0102-PPSA07813_00-CLASSICRE2000001-E001",
+    "upsellServiceBranding": [
+      "NONE"
+    ],
+    "upsellText": null
+  },
+  "storeDisplayClassification": "FULL_GAME"
+}
