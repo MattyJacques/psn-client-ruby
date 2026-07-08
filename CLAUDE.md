@@ -14,7 +14,7 @@ bundle exec rubocop              # lint (add -a to autocorrect)
 ruby bin/smoke                   # live-API check; needs PSN_NPSSO or PSN_REFRESH_TOKEN env var
 ```
 
-CI runs rspec + rubocop on Ruby 3.2, 3.4 and head. RuboCop enforces double-quoted strings, LF line endings, max line length 120, `NewCops: enable`.
+CI (GitHub Actions) runs rspec on Ruby 3.2, 3.3, 3.4 and head (head is non-blocking), plus rubocop and bundler-audit jobs on 3.4; Dependabot files weekly gem/action update PRs. SimpleCov gates the rspec run at line 99% / branch 85%. RuboCop enforces double-quoted strings, LF line endings, max line length 120, `NewCops: enable`.
 
 `bin/smoke` hits the real PSN API and is NOT part of the test suite — use it to verify the undocumented endpoints still work after changing them.
 
