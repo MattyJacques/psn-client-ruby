@@ -13,5 +13,6 @@ RSpec.describe PSN::UserSearchResult do
   it "keeps the raw payload and tolerates missing keys" do
     expect(described_class.from_api(fixture("user_search_player")).raw).to eq(fixture("user_search_player"))
     expect(described_class.from_api({})).not_to be_ps_plus
+    expect(described_class.from_api(fixture("user_search_player")).relationship_state).to be_nil
   end
 end
