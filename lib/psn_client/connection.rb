@@ -42,12 +42,14 @@ module PSN
 
     # Persisted-query GraphQL GET. Sony's GraphQL can fail with HTTP 200 and
     # an errors array in the body, so that case is mapped to APIError here.
-    def graphql(operation_name, variables, sha256_hash)
+    # The mobile app's queries live on :mobile; the web store's anonymous
+    # catalog queries live on :web — same /api/graphql/v1/op path on both.
+    def graphql(operation_name, variables, sha256_hash, host: :mobile, headers: {})
       extensions = { "persistedQuery" => { "version" => 1, "sha256Hash" => sha256_hash } }
       params = { "operationName" => operation_name,
                  "variables" => JSON.generate(variables),
                  "extensions" => JSON.generate(extensions) }
-      body = request(:mobile, :get, GRAPHQL_PATH, params, headers: GRAPHQL_HEADERS)
+      body = request(host, :get, GRAPHQL_PATH, params, headers: GRAPHQL_HEADERS.merge(headers))
       handle_graphql_errors(body)
       body
     end
