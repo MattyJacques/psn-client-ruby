@@ -1,0 +1,28 @@
+{
+  "__typename": "Product",
+  "id": "UP6312-PPSA31381_00-0202050640964065",
+  "invariantName": "Fable Standard Edition",
+  "name": "Fable Standard Edition",
+  "npTitleId": "PPSA31381_00",
+  "platforms": ["PS5"],
+  "publisherName": "Microsoft Corporation",
+  "releaseDate": "2027-02-23T16:00:00Z",
+  "storeDisplayClassification": "FULL_GAME",
+  "localizedStoreDisplayClassification": "Full Game",
+  "topCategory": "GAME",
+  "concept": { "__typename": "Concept", "id": "10015869" },
+  "combinedLocalizedGenres": [
+    { "__typename": "LocalizedGenreSubGenre", "value": "Adventure" },
+    { "__typename": "LocalizedGenreSubGenre", "value": "Fantasy" }
+  ],
+  "descriptions": [
+    { "__typename": "Description", "type": "SHORT", "value": "A hero returns." },
+    { "__typename": "Description", "type": "LONG", "value": "Fable is an action RPG set in Albion." }
+  ],
+  "edition": { "__typename": "ProductEdition", "name": "Fable Standard Edition", "features": ["Fable Base Game"] },
+  "contentRating": { "__typename": "ProductContentRating", "authority": "ESRB", "description": "ESRB Mature 17+" },
+  "media": [
+    { "__typename": "Media", "role": "GAMEHUB_COVER_ART", "type": "IMAGE",
+      "url": "https://image.api.playstation.com/vulcan/cover.png" }
+  ]
+}
