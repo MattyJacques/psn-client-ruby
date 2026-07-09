@@ -24,7 +24,7 @@ Unofficial Ruby gem for the PlayStation Network API. Everything lives under the 
 
 Layers, top to bottom:
 
-- **`PSN::Client`** (`client.rb`) — entry point; builds `Auth` + `Connection` once and memoizes resource objects (`client.games`, `client.trophies`, `client.store`, `client.profiles`).
+- **`PSN::Client`** (`client.rb`) — entry point; builds `Auth` + `Connection` once and memoizes resource objects (`client.games`, `client.trophies`, `client.store`, `client.profiles`, `client.search`, `client.catalog`).
 - **Resources** (`lib/psn_client/resources/`) — one class per API area. Each knows its endpoint paths/page sizes as constants, calls `Connection`, and maps responses to models. `Resources::Users` is internal-only: it resolves friendly online IDs to Sony numeric account IDs (cached), and is injected into `Games` and `Trophies` — a `nil` online_id means the authenticated account (`"me"`).
 - **`PSN::Connection`** (`connection.rb`) — shared Faraday HTTP layer. Keeps one connection per named host (`HOSTS`: `:mobile`, `:web`, `:community`, `:dms`); injects the Bearer token per request; retries 5xx; on a 401 refreshes the token once and retries; maps HTTP status to the error hierarchy. Also does persisted-query GraphQL GETs, where Sony can return HTTP 200 with an `errors` array — that is mapped to `APIError` too.
 - **`PSN::Auth`** (`auth.rb`) — exchanges an NPSSO token or a saved refresh token for OAuth tokens (mutex-guarded, refreshes the ~1h access token early). Nothing is persisted; callers read `#refresh_token` and store it themselves.
@@ -37,7 +37,7 @@ Cross-cutting pieces:
 
 ### Undocumented endpoints
 
-The transaction/entitlement endpoints, the GraphQL persisted queries (operation names + sha256 hashes), and the legacy profile2 endpoint are undocumented Sony internals that can change without notice. Knowledge of each is deliberately confined to one file: `resources/store.rb`, `resources/games.rb`, `resources/profiles.rb`. Quirks discovered by live testing (e.g. the library limit cap of 100, profile2 rejecting `"me"`) are recorded in comments there — keep them accurate, and verify changes with `bin/smoke`.
+The transaction/entitlement endpoints, the GraphQL persisted queries (operation names + sha256 hashes), and the legacy profile2 endpoint are undocumented Sony internals that can change without notice. Knowledge of each is deliberately confined to one file each: `resources/store.rb`, `resources/games.rb`, `resources/profiles.rb`, `resources/search.rb` (game/user search), `resources/catalog.rb` (web-host store catalog, served anonymously), and the Game Help queries in `resources/trophies.rb`. Quirks discovered by live testing (e.g. the library limit cap of 100, profile2 rejecting `"me"`) are recorded in comments there — keep them accurate, and verify changes with `bin/smoke`.
 
 ## Tests
 

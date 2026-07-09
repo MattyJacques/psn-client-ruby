@@ -60,6 +60,24 @@ client.trophies.groups(np_communication_id: "NPWR20188_00")  # base game vs DLC
 client.store.transactions.first(20)  # orders, refunds, wallet funding
 client.store.entitlements.to_a       # everything owned incl. free claims
 client.store.wishlist.to_a           # store wishlist incl. unreleased concepts
+
+# Search the store and players
+client.search.games("astro bot").first(5)         # => PSN::CatalogItem (lazy)
+client.search.games("horizon", domain: :add_ons)  # DLC search
+client.search.users("a_friend").first(5)          # => PSN::UserSearchResult (lazy)
+
+# Store catalog (anonymous web-store data)
+product = client.catalog.product("UP9000-PPSA01325_00-...")   # => PSN::StoreProduct
+client.catalog.concept(product.concept_id)                    # => PSN::StoreConcept
+client.catalog.pricing(product.concept_id)                    # => PSN::Price or nil
+client.catalog.product_rating(product.id)                     # => PSN::StarRating or nil
+client.catalog.category(:ps5_games).first(10)                 # browse store categories
+client.catalog.add_ons("PPSA01325_00").first(10)              # DLC for a title
+
+# Trophy Game Help (PS+ hints)
+infos = client.trophies.game_help_availability(np_communication_id: "NPWR20188_00")
+help  = client.trophies.game_help(np_communication_id: "NPWR20188_00", trophies: infos.first(2))
+help.access?  # false without a PS+ subscription
 ```
 
 `games.purchased` and `store.entitlements` overlap but answer different
@@ -88,8 +106,10 @@ ruby bin/smoke          # live-API check; needs PSN_NPSSO or PSN_REFRESH_TOKEN
 
 Note: the transaction/entitlement endpoints, the GraphQL persisted queries
 and the legacy profile endpoint are undocumented and may change; they live
-in `lib/psn_client/resources/store.rb`, `lib/psn_client/resources/games.rb`
-and `lib/psn_client/resources/profiles.rb` if they need updating.
+in `lib/psn_client/resources/store.rb`, `lib/psn_client/resources/games.rb`,
+`lib/psn_client/resources/profiles.rb`, `lib/psn_client/resources/search.rb`,
+`lib/psn_client/resources/catalog.rb` and the Game Help queries in
+`lib/psn_client/resources/trophies.rb` if they need updating.
 
 ## License
 
