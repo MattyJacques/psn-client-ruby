@@ -23,5 +23,7 @@ RSpec.describe PSN::Price do
     price = described_class.from_api({})
     expect(price).not_to be_discounted
     expect(price.end_time).to be_nil
+    matching = described_class.from_api({ "basePriceValue" => 6999, "discountedValue" => 6999 })
+    expect(matching).not_to be_discounted
   end
 end

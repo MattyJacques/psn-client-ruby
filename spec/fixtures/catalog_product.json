@@ -1,0 +1,26 @@
+{
+  "__typename": "Product",
+  "id": "UP6312-PPSA31381_00-0202050640964065",
+  "name": "Fable Standard Edition",
+  "npTitleId": "PPSA31381_00",
+  "platforms": ["PS5"],
+  "storeDisplayClassification": "FULL_GAME",
+  "localizedStoreDisplayClassification": "Full Game",
+  "media": [
+    { "__typename": "Media", "role": "PREVIEW", "type": "VIDEO",
+      "url": "https://vulcan.dl.playstation.net/img/rnd/202606/0719/preview.mp4" },
+    { "__typename": "Media", "role": "BACKGROUND", "type": "IMAGE",
+      "url": "https://image.api.playstation.com/vulcan/ap/rnd/202605/2823/background.png" },
+    { "__typename": "Media", "role": "GAMEHUB_COVER_ART", "type": "IMAGE",
+      "url": "https://image.api.playstation.com/vulcan/ap/rnd/202605/2823/cover.png" }
+  ],
+  "price": {
+    "__typename": "SkuPrice",
+    "basePrice": "$69.99", "basePriceValue": 6999,
+    "discountedPrice": "$69.99", "discountedValue": 6999,
+    "discountText": null, "currencyCode": "USD", "campaignId": null, "endTime": null,
+    "isExclusive": false, "isFree": false, "isTiedToSubscription": false,
+    "qualifications": null, "rewardId": "", "serviceBranding": ["NONE"],
+    "skuId": "UP6312-PPSA31381_00-0202050640964065-U001"
+  }
+}
