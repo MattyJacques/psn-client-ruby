@@ -59,6 +59,29 @@ RSpec.describe PSN::Paginator do
       expect(enum.to_a).to eq([1, 2])
     end
 
+    it "yields the running position alongside the cursor" do
+      pages = { nil => [[1, 2], "c1"], "c1" => [[3], "c2"], "c2" => [[4], nil] }
+      positions = []
+      enum = described_class.cursor do |cursor, position|
+        positions << position
+        pages.fetch(cursor)
+      end
+      expect(enum.to_a).to eq([1, 2, 3, 4])
+      expect(positions).to eq([0, 2, 3])
+    end
+
+    it "restarts the position when the enumerator is re-enumerated" do
+      pages = { nil => [[1, 2], "c1"], "c1" => [[3], nil] }
+      positions = []
+      enum = described_class.cursor do |cursor, position|
+        positions << position
+        pages.fetch(cursor)
+      end
+      first_pass = enum.to_a
+      expect(enum.to_a).to eq(first_pass)
+      expect(positions).to eq([0, 2, 0, 2])
+    end
+
     it "stops when the API repeats the same cursor instead of looping forever" do
       calls = 0
       enum = described_class.cursor do |_cursor|

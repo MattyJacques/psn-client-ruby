@@ -119,5 +119,15 @@ RSpec.describe PSN::Connection do
       expect(connection.graphql("getThing", {}, "abc123")).to eq("data" => { "ok" => true })
       expect(auth).to have_received(:refresh!).once
     end
+
+    it "targets another host and merges extra headers when asked" do
+      stub_request(:get, "https://web.np.playstation.com/api/graphql/v1/op")
+        .with(query: hash_including("operationName" => "getThing"),
+              headers: { "Apollo-Require-Preflight" => "true", "X-Extra" => "1" })
+        .to_return(json_response({ "data" => { "ok" => true } }))
+
+      body = connection.graphql("getThing", {}, "abc123", host: :web, headers: { "X-Extra" => "1" })
+      expect(body).to eq("data" => { "ok" => true })
+    end
   end
 end

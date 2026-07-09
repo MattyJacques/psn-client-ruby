@@ -1,0 +1,30 @@
+{
+  "__typename": "Tips",
+  "hasAccess": true,
+  "trophies": [
+    {
+      "__typename": "TrophyTip",
+      "id": "NPWR20188_00::18",
+      "trophyId": "18",
+      "totalGroupCount": 1,
+      "groups": [
+        {
+          "__typename": "TipGroup",
+          "groupId": null,
+          "groupName": null,
+          "tipContents": [
+            {
+              "__typename": "TipContent",
+              "description": "The gatcha prize you seek is inside a silver ball.",
+              "displayName": "Since 1995",
+              "mediaId": "psn534f6d378d6841939cd709202c46a220",
+              "mediaType": "VIDEO",
+              "mediaUrl": "https://gms-ght.playstation-cloud.com/video/master_playlist.m3u8",
+              "tipId": "NPWR20188_00__GATCHA_SECRET_H1"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

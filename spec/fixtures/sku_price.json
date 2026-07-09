@@ -1,0 +1,18 @@
+{
+  "__typename": "SkuPrice",
+  "basePrice": "$69.99",
+  "basePriceValue": 6999,
+  "discountedPrice": "$48.99",
+  "discountedValue": 4899,
+  "discountText": "-30%",
+  "currencyCode": "USD",
+  "campaignId": null,
+  "endTime": "2026-07-23T14:59:00Z",
+  "isExclusive": false,
+  "isFree": false,
+  "isTiedToSubscription": false,
+  "qualifications": null,
+  "rewardId": "",
+  "serviceBranding": ["NONE"],
+  "skuId": "UP6312-PPSA31381_00-0202050640964065-U001"
+}

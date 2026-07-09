@@ -16,6 +16,15 @@ module PSN
       GROUPS_DEFINITIONS_PATH = "/api/trophy/v1/npCommunicationIds/%s/trophyGroups"
       GROUPS_EARNED_PATH = "/api/trophy/v1/users/%s/npCommunicationIds/%s/trophyGroups"
 
+      # Game Help (PS+ trophy hints) persisted queries. Undocumented; Sony
+      # can change hashes and shape at any time — verify with bin/smoke.
+      # Requests must identify as the PlayStation App or Sony rejects them.
+      GAME_HELP_HEADERS = { "apollographql-client-name" => "PlayStationApp-Android" }.freeze
+      HELP_AVAILABILITY_OPERATION = "metGetHintAvailability"
+      HELP_AVAILABILITY_HASH = "71bf26729f2634f4d8cca32ff73aaf42b3b76ad1d2f63b490a809b66483ea5a7"
+      TIPS_OPERATION = "metGetTips"
+      TIPS_HASH = "93768752a9f4ef69922a543e2209d45020784d8781f57b37a5294e6e206c5630"
+
       def initialize(connection, users)
         @connection = connection
         @users = users
@@ -66,6 +75,28 @@ module PSN
         merge_groups(definitions["trophyGroups"] || [], earned["trophyGroups"] || []).lazy
       end
 
+      # Trophies in a title that have Game Help available. Pass trophy_ids
+      # to limit the check; the results feed straight into #game_help.
+      def game_help_availability(np_communication_id:, trophy_ids: nil)
+        variables = { "npCommId" => np_communication_id }
+        variables["trophyIds"] = trophy_ids.map(&:to_s) if trophy_ids
+        response = @connection.graphql(HELP_AVAILABILITY_OPERATION, variables,
+                                       HELP_AVAILABILITY_HASH, headers: GAME_HELP_HEADERS)
+        trophies = response.dig("data", "hintAvailabilityRetrieve", "trophies") || []
+        trophies.lazy.map { |t| TrophyHelpInfo.from_api(t) }
+      end
+
+      # The Game Help content itself. trophies takes TrophyHelpInfo objects
+      # (from #game_help_availability) or hashes with :trophy_id,
+      # :uds_object_id and :help_type. GameHelp#access? is false without PS+.
+      def game_help(np_communication_id:, trophies:)
+        variables = { "npCommId" => np_communication_id,
+                      "trophies" => trophies.map { |t| help_request(t) } }
+        response = @connection.graphql(TIPS_OPERATION, variables, TIPS_HASH,
+                                       headers: GAME_HELP_HEADERS)
+        GameHelp.from_api(response.dig("data", "tipsRetrieve") || {})
+      end
+
       private
 
       # PS5 titles use the default trophy2 service; everything older needs
@@ -74,6 +105,16 @@ module PSN
         return {} if platform.nil? || platform.to_s.upcase.start_with?("PS5")
 
         { "npServiceName" => "trophy" }
+      end
+
+      def help_request(trophy)
+        if trophy.is_a?(TrophyHelpInfo)
+          { "trophyId" => trophy.trophy_id, "udsObjectId" => trophy.uds_object_id,
+            "helpType" => trophy.help_type }
+        else
+          { "trophyId" => trophy[:trophy_id].to_s, "udsObjectId" => trophy[:uds_object_id],
+            "helpType" => trophy[:help_type] }
+        end
       end
 
       def merge(definitions, earned)

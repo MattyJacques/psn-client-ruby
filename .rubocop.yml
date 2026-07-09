@@ -43,10 +43,11 @@ RSpec/SpecFilePathFormat:
     PSN: psn_client
   Exclude:
     - "spec/psn_client/errors_spec.rb"
-    - "spec/psn_client/models/game_title_spec.rb"
-    - "spec/psn_client/models/profile_spec.rb"
-    - "spec/psn_client/models/trophy_models_spec.rb"
-    - "spec/psn_client/models/library_models_spec.rb"
+    - "spec/psn_client/models/*_spec.rb"
+
+RSpec/MultipleDescribes:
+  Exclude:
+    - "spec/psn_client/models/game_help_spec.rb"
 
 RSpec/MultipleExpectations:
   Max: 5

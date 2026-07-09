@@ -1,0 +1,28 @@
+# frozen_string_literal: true
+
+module PSN
+  # Full store product detail (metGetProductById). Unlike CatalogItem this
+  # carries no price — use Catalog#pricing with concept_id for that. An
+  # unknown/unavailable ID yields a hollow model (members nil/empty, raw {})
+  # rather than nil or an error — check name (or raw) for presence.
+  StoreProduct = Data.define(:name, :id, :np_title_id, :invariant_name, :concept_id,
+                             :platforms, :publisher, :release_date, :genres,
+                             :classification, :localized_classification, :edition,
+                             :short_description, :description, :content_rating,
+                             :image_url, :raw) do
+    def self.from_api(hash)
+      new(name: hash["name"], id: hash["id"], np_title_id: hash["npTitleId"],
+          invariant_name: hash["invariantName"], concept_id: hash.dig("concept", "id"),
+          platforms: hash["platforms"] || [], publisher: hash["publisherName"],
+          release_date: Mapping.time(hash["releaseDate"]),
+          genres: (hash["combinedLocalizedGenres"] || []).map { |g| g["value"] },
+          classification: hash["storeDisplayClassification"],
+          localized_classification: hash["localizedStoreDisplayClassification"],
+          edition: hash.dig("edition", "name"),
+          short_description: Mapping.description(hash, "SHORT"),
+          description: Mapping.description(hash, "LONG"),
+          content_rating: hash.dig("contentRating", "description"),
+          image_url: Mapping.cover_url(hash["media"] || []), raw: hash)
+    end
+  end
+end

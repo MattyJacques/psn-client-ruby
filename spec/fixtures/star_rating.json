@@ -1,0 +1,13 @@
+{
+  "__typename": "StarRating",
+  "averageRating": 4.6,
+  "averageRatingForDisplay": "4.60",
+  "totalRatingsCount": 15382,
+  "ratingsDistribution": [
+    { "__typename": "StarRatingCount", "rating": 5, "percentage": "78%", "percentageRaw": 78.1 },
+    { "__typename": "StarRatingCount", "rating": 4, "percentage": "12%", "percentageRaw": 12.0 },
+    { "__typename": "StarRatingCount", "rating": 3, "percentage": "5%", "percentageRaw": 5.0 },
+    { "__typename": "StarRatingCount", "rating": 2, "percentage": "2%", "percentageRaw": 2.0 },
+    { "__typename": "StarRatingCount", "rating": 1, "percentage": "3%", "percentageRaw": 2.9 }
+  ]
+}

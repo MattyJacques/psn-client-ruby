@@ -18,6 +18,8 @@ module PSN
     def trophies = @trophies ||= Resources::Trophies.new(@connection, users)
     def store = @store ||= Resources::Store.new(@connection)
     def profiles = @profiles ||= Resources::Profiles.new(@connection)
+    def search = @search ||= Resources::Search.new(@connection)
+    def catalog = @catalog ||= Resources::Catalog.new(@connection)
 
     # Triggers authentication if it has not happened yet.
     def access_token = @auth.access_token

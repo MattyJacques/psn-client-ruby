@@ -78,5 +78,40 @@ section("Trophy groups for most recent trophy title") do
   end
 end
 
+section("Search: 3 games matching 'astro'") do
+  client.search.games("astro").first(3).each do |g|
+    puts "#{g.name} [#{g.platforms.join('/')}] #{g.price&.discounted_price || '-'}"
+  end
+end
+
+section("Search: 3 users matching 'test'") do
+  client.search.users("test").first(3).each { |u| puts "#{u.online_id} plus=#{u.ps_plus?}" }
+end
+
+section("Catalog: product detail, pricing and rating via search") do
+  hit = client.search.games("astro bot").first(1).first
+  product = client.catalog.product(hit.id)
+  puts "#{product.name} by #{product.publisher} (#{product.content_rating})"
+  puts "price: #{client.catalog.pricing(product.concept_id)&.discounted_price || '-'}"
+  rating = client.catalog.product_rating(hit.id)
+  puts "rating: #{rating&.average_display} from #{rating&.total} ratings"
+end
+
+section("Catalog: 3 newest PS5 games") do
+  client.catalog.category(:ps5_games).first(3).each { |g| puts "#{g.name} #{g.price&.base_price || '-'}" }
+end
+
+section("Catalog: add-ons for most recent played game") do
+  id = client.games.played.first(1).first.title_id
+  client.catalog.add_ons(id).first(3).each { |a| puts "#{a.name} #{a.price&.discounted_price || '-'}" }
+end
+
+section("Game Help for ASTRO's PLAYROOM (NPWR20188_00)") do
+  infos = client.trophies.game_help_availability(np_communication_id: "NPWR20188_00").first(3)
+  infos.each { |t| puts "trophy #{t.trophy_id} #{t.help_type} #{t.uds_object_id}" }
+  help = client.trophies.game_help(np_communication_id: "NPWR20188_00", trophies: infos.first(1))
+  puts "access=#{help.access?} tips=#{help.tips.flat_map(&:contents).map(&:display_name).join(', ')}"
+end
+
 puts "\nRefresh token (persist for next session):"
 puts client.refresh_token
