@@ -1,0 +1,13 @@
+{
+  "__typename": "Concept",
+  "boxArt": {
+    "__typename": "Media",
+    "url": "https://image.api.playstation.com/vulcan/ap/rnd/202505/2906/57a51bad6ae63fb29c8c4e92e5aabcb3d73dc2b0ba54b582.png"
+  },
+  "id": "10015616",
+  "localizedStoreDisplayClassification": null,
+  "name": "Shelter Survival",
+  "platforms": [],
+  "price": null,
+  "storeDisplayClassification": null
+}

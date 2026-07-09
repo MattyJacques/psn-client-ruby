@@ -57,6 +57,12 @@ section("5 purchased games") do
   client.games.purchased.first(5).each { |g| puts "#{g.name} [#{g.platform}] downloadable=#{g.downloadable?}" }
 end
 
+section("5 wishlist items") do
+  client.store.wishlist.first(5).each do |w|
+    puts "#{w.name} #{w.concept? ? '[concept]' : w.platforms.join('/')} #{w.discounted_price || '-'}"
+  end
+end
+
 section("Trophy title summary for 2 recent games") do
   ids = client.games.played.first(2).map(&:title_id)
   client.trophies.title_summary(title_ids: ids).each do |s|
