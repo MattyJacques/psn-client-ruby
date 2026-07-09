@@ -97,11 +97,12 @@ Nothing new. `Connection#graphql` already maps HTTP errors and
 - Fixture `spec/fixtures/wishlist_item.json` distilled from the captured
   live response: one `Product` with `PS_PLUS` branding and one `Concept`
   (nil price, empty platforms), so both shapes are covered.
-- WebMock spec additions in `spec/psn_client/resources/store_spec.rb`
-  mirroring the `Games#library` spec: stubs the persisted-query GET
-  (operationName + hash in params), asserts mapped fields for both item
-  types, asserts the nil-price Concept case, asserts laziness (no HTTP
-  until consumed), and the empty-wishlist `[]` default.
+- Spec additions in `spec/psn_client/resources/store_spec.rb` mirroring
+  the `Games#library` spec: mocks `Connection#graphql` via
+  `instance_double` (the house convention — WebMock guards the Connection
+  layer itself), asserts mapped fields for both item types, the nil-price
+  Concept case, the `Enumerator::Lazy` return type (the fetch itself is
+  eager, matching `Games#library`), and the empty-wishlist `[]` default.
 - Model coverage goes in the existing
   `spec/psn_client/models/store_models_spec.rb` alongside the other store
   models.

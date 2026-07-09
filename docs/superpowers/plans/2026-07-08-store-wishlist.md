@@ -308,7 +308,7 @@ In `bin/smoke`, add after the "5 purchased games" section:
 ```ruby
 section("5 wishlist items") do
   client.store.wishlist.first(5).each do |w|
-    puts "#{w.name} #{w.concept? ? "[concept]" : w.platforms.join("/")} #{w.discounted_price || "-"}"
+    puts "#{w.name} #{w.concept? ? '[concept]' : w.platforms.join('/')} #{w.discounted_price || '-'}"
   end
 end
 ```

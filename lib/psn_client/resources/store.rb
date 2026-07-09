@@ -2,10 +2,10 @@
 
 module PSN
   module Resources
-    # Purchases for the AUTHENTICATED account only. Sony does not document
-    # these endpoints and has changed them before; all knowledge of their
-    # hosts, paths and response keys is confined to this file so a change
-    # only lands here (and in the two store models). Verify with bin/smoke.
+    # Purchases and wishlist for the AUTHENTICATED account only. Sony does
+    # not document these endpoints and has changed them before; all knowledge
+    # of their hosts, paths and response keys is confined to this file so a
+    # change only lands here (and in the store models). Verify with bin/smoke.
     class Store
       TRANSACTIONS_HOST = :web
       TRANSACTIONS_PATH = "/api/transact/v1/purchases/transactions"
