@@ -133,4 +133,57 @@ RSpec.describe PSN::Resources::Trophies do
       expect(result.first.earned_counts).to be_nil
     end
   end
+
+  describe "#game_help_availability" do
+    it "lists trophies with Game Help via metGetHintAvailability" do
+      response = { "data" => { "hintAvailabilityRetrieve" => { "trophies" => [fixture("help_availability")] } } }
+      allow(connection).to receive(:graphql)
+        .with("metGetHintAvailability", { "npCommId" => "NPWR20188_00" },
+              described_class::HELP_AVAILABILITY_HASH, headers: described_class::GAME_HELP_HEADERS)
+        .and_return(response)
+
+      result = trophies.game_help_availability(np_communication_id: "NPWR20188_00").to_a
+      expect(result.size).to eq(1)
+      expect(result.first).to be_a(PSN::TrophyHelpInfo)
+      expect(result.first.uds_object_id).to eq("GATCHA_SECRET")
+    end
+
+    it "limits the check to specific trophy IDs when given" do
+      response = { "data" => { "hintAvailabilityRetrieve" => { "trophies" => [] } } }
+      allow(connection).to receive(:graphql)
+        .with("metGetHintAvailability", { "npCommId" => "NPWR20188_00", "trophyIds" => %w[18 19] },
+              described_class::HELP_AVAILABILITY_HASH, headers: described_class::GAME_HELP_HEADERS)
+        .and_return(response)
+
+      expect(trophies.game_help_availability(np_communication_id: "NPWR20188_00", trophy_ids: [18, 19]).to_a).to eq([])
+    end
+  end
+
+  describe "#game_help" do
+    let(:tips_variables) do
+      { "npCommId" => "NPWR20188_00",
+        "trophies" => [{ "trophyId" => "18", "udsObjectId" => "GATCHA_SECRET", "helpType" => "HINT" }] }
+    end
+
+    before do
+      allow(connection).to receive(:graphql)
+        .with("metGetTips", tips_variables, described_class::TIPS_HASH,
+              headers: described_class::GAME_HELP_HEADERS)
+        .and_return({ "data" => { "tipsRetrieve" => fixture("trophy_tips") } })
+    end
+
+    it "fetches tips for TrophyHelpInfo objects" do
+      info = PSN::TrophyHelpInfo.from_api(fixture("help_availability"))
+      help = trophies.game_help(np_communication_id: "NPWR20188_00", trophies: [info])
+      expect(help).to be_a(PSN::GameHelp)
+      expect(help).to be_access
+      expect(help.tips.first.contents.first.display_name).to eq("Since 1995")
+    end
+
+    it "accepts plain hashes with symbol keys" do
+      help = trophies.game_help(np_communication_id: "NPWR20188_00",
+                                trophies: [{ trophy_id: 18, uds_object_id: "GATCHA_SECRET", help_type: "HINT" }])
+      expect(help.tips.size).to eq(1)
+    end
+  end
 end
