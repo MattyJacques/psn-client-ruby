@@ -58,6 +58,12 @@ RSpec.describe PSN::Resources::Catalog do
 
       expect(catalog.product_rating(product_id).average).to eq(4.6)
     end
+
+    it "returns nil when the product has no ratings" do
+      allow(connection).to receive(:graphql)
+        .and_return({ "data" => { "productRetrieve" => { "starRating" => nil } } })
+      expect(catalog.product_rating(product_id)).to be_nil
+    end
   end
 
   describe "#concept_rating" do
@@ -70,6 +76,52 @@ RSpec.describe PSN::Resources::Catalog do
         .and_return(response)
 
       expect(catalog.concept_rating("10015869").total).to eq(15_382)
+    end
+  end
+
+  describe "#add_ons" do
+    it "walks offset pages of add-on products" do
+      page = { "addOnProducts" => [fixture("catalog_product")], "pageInfo" => { "totalCount" => 1 } }
+      allow(connection).to receive(:graphql)
+        .with("metGetAddOnsByTitleId",
+              { "npTitleId" => "PPSA31381_00", "pageArgs" => { "size" => 50, "offset" => 0 } },
+              described_class::ADD_ONS_HASH, host: :web)
+        .and_return({ "data" => { "addOnProductsByTitleIdRetrieve" => page } })
+
+      result = catalog.add_ons("PPSA31381_00").to_a
+      expect(result.size).to eq(1)
+      expect(result.first).to be_a(PSN::CatalogItem)
+    end
+  end
+
+  describe "#category" do
+    let(:grid_variables) do
+      { "id" => described_class::CATEGORIES[:ps5_games],
+        "pageArgs" => { "size" => 50, "offset" => 0 },
+        "sortBy" => { "name" => "productReleaseDate", "isAscending" => false },
+        "filterBy" => [], "facetOptions" => [] }
+    end
+
+    it "accepts a category symbol and maps grid products" do
+      grid = { "products" => [fixture("catalog_product")], "pageInfo" => { "totalCount" => 1 } }
+      allow(connection).to receive(:graphql)
+        .with("categoryGridRetrieve", grid_variables, described_class::CATEGORY_HASH, host: :web)
+        .and_return({ "data" => { "categoryGridRetrieve" => grid } })
+
+      result = catalog.category(:ps5_games).to_a
+      expect(result.size).to eq(1)
+      expect(result.first.name).to eq("Fable Standard Edition")
+    end
+
+    it "passes raw category UUIDs through and rejects unknown symbols" do
+      empty_grid = { "products" => [], "pageInfo" => { "totalCount" => 0 } }
+      allow(connection).to receive(:graphql)
+        .with("categoryGridRetrieve", hash_including("id" => "some-uuid"),
+              described_class::CATEGORY_HASH, host: :web)
+        .and_return({ "data" => { "categoryGridRetrieve" => empty_grid } })
+
+      expect(catalog.category("some-uuid").to_a).to eq([])
+      expect { catalog.category(:nope).to_a }.to raise_error(KeyError)
     end
   end
 end
