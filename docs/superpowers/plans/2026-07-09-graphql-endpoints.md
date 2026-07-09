@@ -638,6 +638,19 @@ module PSN
 end
 ```
 
+> **CORRECTION (found in review):** the snippet above keeps `offset = 0` in
+> method scope OUTSIDE the `Paginator.cursor` block, so re-enumerating the
+> returned lazy enumerator resumes from the mutated offset and silently
+> skips/duplicates results. As implemented, `Paginator.cursor` now tracks the
+> running position inside its `Enumerator.new` block and yields it to the
+> caller block as a second argument (`|cursor, offset|`); `result_items` uses
+> that instead of a local variable. The per-context constants also bundle
+> `domain_extras` (games `{}`, users `{"displayTitleLocale" => LOCALE}`) so
+> `domain_page(term, domain, queries, cursor, offset)` stays within the
+> 5-parameter RuboCop limit without a disable. See
+> `lib/psn_client/resources/search.rb` for the final shape — don't copy the
+> snippet's `result_items`/`domain_page` verbatim in later tasks.
+
 Add to `lib/psn_client.rb` after `resources/profiles`:
 
 ```ruby

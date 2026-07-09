@@ -23,12 +23,16 @@ module PSN
       PAGE_SIZE = 20
       # The PlayStation App identifies itself on search requests.
       HEADERS = { "apollographql-client-name" => "PlayStationApp-Android" }.freeze
-      # Per-context bundle of the two persisted-query hashes plus the context
-      # name, so result_items only needs to thread one keyword through.
+      # Per-context bundle of the persisted-query hashes, context name and
+      # extra domain-query variables, so result_items only threads one
+      # keyword through. The games domain query rejects displayTitleLocale
+      # while the users one requires it (mirrors the app's persisted
+      # documents) — hence per-context domain_extras.
       GAMES_QUERIES = { context: GAMES_CONTEXT, context_hash: GAMES_CONTEXT_HASH,
-                        domain_hash: GAMES_DOMAIN_HASH }.freeze
+                        domain_hash: GAMES_DOMAIN_HASH, domain_extras: {}.freeze }.freeze
       USERS_QUERIES = { context: USERS_CONTEXT, context_hash: USERS_CONTEXT_HASH,
-                        domain_hash: USERS_DOMAIN_HASH }.freeze
+                        domain_hash: USERS_DOMAIN_HASH,
+                        domain_extras: { "displayTitleLocale" => LOCALE }.freeze }.freeze
 
       def initialize(connection)
         @connection = connection
@@ -42,45 +46,38 @@ module PSN
 
       # Player search by online ID or display name.
       def users(term)
-        items = result_items(term, domain: USERS_DOMAIN, queries: USERS_QUERIES,
-                                   domain_extras: { "displayTitleLocale" => LOCALE })
+        items = result_items(term, domain: USERS_DOMAIN, queries: USERS_QUERIES)
         items.map { |item| UserSearchResult.from_api(item["result"] || {}) }
       end
 
       private
 
-      # The games domain query rejects displayTitleLocale while the users one
-      # requires it (mirrors the app's persisted documents) — hence
-      # domain_extras rather than always sending it.
-      def result_items(term, domain:, queries:, domain_extras: {})
-        offset = 0
-        Paginator.cursor do |cursor|
-          items, next_cursor =
-            if cursor.nil?
-              context_page(term, domain, queries)
-            else
-              domain_page(term, domain, queries[:domain_hash], [cursor, offset], domain_extras)
-            end
-          offset += items.size
-          [items, next_cursor]
+      # Paginator.cursor tracks the running offset inside the enumerator, so
+      # re-enumerating restarts cleanly from the context page at offset 0.
+      def result_items(term, domain:, queries:)
+        Paginator.cursor do |cursor, offset|
+          if cursor.nil?
+            context_page(term, domain, queries)
+          else
+            domain_page(term, domain, queries, cursor, offset)
+          end
         end
       end
 
       def context_page(term, domain, queries)
-        variables = { "searchTerm" => term, "searchContext" => queries[:context],
+        variables = { "searchTerm" => term, "searchContext" => queries.fetch(:context),
                       "displayTitleLocale" => LOCALE }
-        response = @connection.graphql(CONTEXT_OPERATION, variables, queries[:context_hash], headers: HEADERS)
+        response = @connection.graphql(CONTEXT_OPERATION, variables, queries.fetch(:context_hash), headers: HEADERS)
         results = response.dig("data", "universalContextSearch", "results") || []
         page = results.find { |r| r["domain"] == domain } || {}
         [page["searchResults"] || [], page["next"]]
       end
 
-      def domain_page(term, domain, hash, cursor_state, extras)
-        cursor, offset = cursor_state
+      def domain_page(term, domain, queries, cursor, offset)
         variables = { "searchTerm" => term, "searchDomain" => domain,
                       "pageSize" => PAGE_SIZE, "pageOffset" => offset,
-                      "nextCursor" => cursor }.merge(extras)
-        response = @connection.graphql(DOMAIN_OPERATION, variables, hash, headers: HEADERS)
+                      "nextCursor" => cursor }.merge(queries.fetch(:domain_extras))
+        response = @connection.graphql(DOMAIN_OPERATION, variables, queries.fetch(:domain_hash), headers: HEADERS)
         page = response.dig("data", "universalDomainSearch") || {}
         [page["searchResults"] || [], page["next"]]
       end
