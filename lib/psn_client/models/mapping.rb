@@ -43,5 +43,20 @@ module PSN
     def subscription(value)
       value == "NONE" ? nil : value
     end
+
+    # The store's box-art equivalent from a Sony media array; prefers the
+    # GAMEHUB_COVER_ART image role and falls back to any image.
+    def cover_url(media)
+      images = media.select { |m| m["type"] == "IMAGE" }
+      cover = images.find { |m| m["role"] == "GAMEHUB_COVER_ART" } || images.first
+      cover && cover["url"]
+    end
+
+    # The value of the first description entry of the given type
+    # ("SHORT"/"LONG"/"LEGAL") from a Sony descriptions array.
+    def description(hash, type)
+      entry = (hash["descriptions"] || []).find { |d| d["type"] == type }
+      entry && entry["value"]
+    end
   end
 end

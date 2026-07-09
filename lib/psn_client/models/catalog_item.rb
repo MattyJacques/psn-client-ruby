@@ -13,15 +13,8 @@ module PSN
           concept: hash["__typename"] == "Concept", platforms: hash["platforms"] || [],
           classification: hash["storeDisplayClassification"],
           localized_classification: hash["localizedStoreDisplayClassification"],
-          image_url: cover_url(hash["media"] || []),
+          image_url: Mapping.cover_url(hash["media"] || []),
           price: price && Price.from_api(price), raw: hash)
-    end
-
-    # The store's box-art equivalent; falls back to any image.
-    def self.cover_url(media)
-      images = media.select { |m| m["type"] == "IMAGE" }
-      cover = images.find { |m| m["role"] == "GAMEHUB_COVER_ART" } || images.first
-      cover && cover["url"]
     end
 
     def concept? = concept

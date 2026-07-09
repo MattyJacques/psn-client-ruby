@@ -157,6 +157,11 @@ RSpec.describe PSN::Resources::Trophies do
 
       expect(trophies.game_help_availability(np_communication_id: "NPWR20188_00", trophy_ids: [18, 19]).to_a).to eq([])
     end
+
+    it "returns no results when the envelope is missing" do
+      allow(connection).to receive(:graphql).and_return({ "data" => nil })
+      expect(trophies.game_help_availability(np_communication_id: "NPWR20188_00").to_a).to eq([])
+    end
   end
 
   describe "#game_help" do

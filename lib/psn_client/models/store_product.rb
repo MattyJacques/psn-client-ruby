@@ -17,15 +17,10 @@ module PSN
           classification: hash["storeDisplayClassification"],
           localized_classification: hash["localizedStoreDisplayClassification"],
           edition: hash.dig("edition", "name"),
-          short_description: description_of(hash, "SHORT"),
-          description: description_of(hash, "LONG"),
+          short_description: Mapping.description(hash, "SHORT"),
+          description: Mapping.description(hash, "LONG"),
           content_rating: hash.dig("contentRating", "description"),
-          image_url: CatalogItem.cover_url(hash["media"] || []), raw: hash)
-    end
-
-    def self.description_of(hash, type)
-      entry = (hash["descriptions"] || []).find { |d| d["type"] == type }
-      entry && entry["value"]
+          image_url: Mapping.cover_url(hash["media"] || []), raw: hash)
     end
   end
 end
