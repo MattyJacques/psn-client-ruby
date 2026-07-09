@@ -13,7 +13,7 @@
 ## Global Constraints
 
 - Everything lives under the `PSN` module (not `PsnClient`).
-- RuboCop: double-quoted strings everywhere (including inside interpolation), LF line endings, max line length 120, `NewCops: enable`. Run `bundle exec rubocop` before every commit.
+- RuboCop: double-quoted string literals (but single quotes inside interpolation — `Style/StringLiteralsInInterpolation` runs at its single-quote default), LF line endings, max line length 120, `NewCops: enable`. Run `bundle exec rubocop` before every commit.
 - Specs: `RSpec.describe` (monkey-patching disabled), WebMock blocks real HTTP, fixtures live in `spec/fixtures/` loaded via `fixture("name")`.
 - Undocumented-endpoint convention: the operation name and sha256 hash appear ONLY in `lib/psn_client/resources/store.rb`, with quirks recorded in comments there.
 - SimpleCov gates `bundle exec rspec` at 99% line / 85% branch — every new branch (e.g. nil-price Concept) needs a test.
