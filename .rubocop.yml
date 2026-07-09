@@ -44,6 +44,7 @@ RSpec/SpecFilePathFormat:
   Exclude:
     - "spec/psn_client/errors_spec.rb"
     - "spec/psn_client/models/catalog_item_spec.rb"
+    - "spec/psn_client/models/game_help_spec.rb"
     - "spec/psn_client/models/game_title_spec.rb"
     - "spec/psn_client/models/price_spec.rb"
     - "spec/psn_client/models/profile_spec.rb"
@@ -53,6 +54,10 @@ RSpec/SpecFilePathFormat:
     - "spec/psn_client/models/trophy_models_spec.rb"
     - "spec/psn_client/models/user_search_result_spec.rb"
     - "spec/psn_client/models/library_models_spec.rb"
+
+RSpec/MultipleDescribes:
+  Exclude:
+    - "spec/psn_client/models/game_help_spec.rb"
 
 RSpec/MultipleExpectations:
   Max: 5
