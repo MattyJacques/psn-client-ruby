@@ -92,6 +92,18 @@ RSpec.describe PSN::Resources::Catalog do
       expect(result.size).to eq(1)
       expect(result.first).to be_a(PSN::CatalogItem)
     end
+
+    it "is lazy: .first(1) only issues one request" do
+      page = { "addOnProducts" => [fixture("catalog_product")], "pageInfo" => { "totalCount" => 51 } }
+      allow(connection).to receive(:graphql)
+        .with("metGetAddOnsByTitleId",
+              { "npTitleId" => "PPSA31381_00", "pageArgs" => { "size" => 50, "offset" => 0 } },
+              described_class::ADD_ONS_HASH, host: :web)
+        .and_return({ "data" => { "addOnProductsByTitleIdRetrieve" => page } })
+
+      expect(catalog.add_ons("PPSA31381_00").first(1).size).to eq(1)
+      expect(connection).to have_received(:graphql).once
+    end
   end
 
   describe "#category" do
@@ -122,6 +134,16 @@ RSpec.describe PSN::Resources::Catalog do
 
       expect(catalog.category("some-uuid").to_a).to eq([])
       expect { catalog.category(:nope).to_a }.to raise_error(KeyError)
+    end
+
+    it "is lazy: .first(1) only issues one request" do
+      grid = { "products" => [fixture("catalog_product")], "pageInfo" => { "totalCount" => 51 } }
+      allow(connection).to receive(:graphql)
+        .with("categoryGridRetrieve", grid_variables, described_class::CATEGORY_HASH, host: :web)
+        .and_return({ "data" => { "categoryGridRetrieve" => grid } })
+
+      expect(catalog.category(:ps5_games).first(1).size).to eq(1)
+      expect(connection).to have_received(:graphql).once
     end
   end
 end
