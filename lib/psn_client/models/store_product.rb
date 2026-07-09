@@ -2,7 +2,9 @@
 
 module PSN
   # Full store product detail (metGetProductById). Unlike CatalogItem this
-  # carries no price — use Catalog#pricing with concept_id for that.
+  # carries no price — use Catalog#pricing with concept_id for that. An
+  # unknown/unavailable ID yields a hollow model (members nil/empty, raw {})
+  # rather than nil or an error — check name (or raw) for presence.
   StoreProduct = Data.define(:name, :id, :np_title_id, :invariant_name, :concept_id,
                              :platforms, :publisher, :release_date, :genres,
                              :classification, :localized_classification, :edition,

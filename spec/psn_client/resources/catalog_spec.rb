@@ -17,6 +17,15 @@ RSpec.describe PSN::Resources::Catalog do
       expect(product).to be_a(PSN::StoreProduct)
       expect(product.name).to eq("Fable Standard Edition")
     end
+
+    it "returns a hollow model for an unknown product" do
+      allow(connection).to receive(:graphql).and_return({ "data" => { "productRetrieve" => nil } })
+
+      product = catalog.product(product_id)
+      expect(product).to be_a(PSN::StoreProduct)
+      expect(product.name).to be_nil
+      expect(product.raw).to eq({})
+    end
   end
 
   describe "#concept" do
@@ -27,6 +36,14 @@ RSpec.describe PSN::Resources::Catalog do
         .and_return({ "data" => { "conceptRetrieve" => fixture("store_concept") } })
 
       expect(catalog.concept(10_015_869).name).to eq("Fable")
+    end
+
+    it "returns a hollow model for an unknown concept" do
+      allow(connection).to receive(:graphql).and_return({ "data" => { "conceptRetrieve" => nil } })
+
+      concept = catalog.concept(10_015_869)
+      expect(concept).to be_a(PSN::StoreConcept)
+      expect(concept.name).to be_nil
     end
   end
 
