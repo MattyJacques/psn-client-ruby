@@ -1,0 +1,17 @@
+{
+  "__typename": "Player",
+  "accountId": "1234567890123456789",
+  "avatarUrl": "https://static-resource.np.community.playstation.net/avatar_m/WWS_A/A0031_m.png",
+  "displayName": "Matty",
+  "displayNameHighlighted": ["Matty"],
+  "firstName": "Matt",
+  "id": "search-player-1",
+  "isPsPlus": true,
+  "itemType": "SOCIAL",
+  "lastName": "J",
+  "middleName": null,
+  "onlineId": "matty_plays",
+  "onlineIdHighlighted": ["matty_plays"],
+  "profilePicUrl": "https://image.api.playstation.com/profile/pic.png",
+  "relationshipState": null
+}

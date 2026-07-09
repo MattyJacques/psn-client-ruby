@@ -48,6 +48,7 @@ RSpec/SpecFilePathFormat:
     - "spec/psn_client/models/price_spec.rb"
     - "spec/psn_client/models/profile_spec.rb"
     - "spec/psn_client/models/trophy_models_spec.rb"
+    - "spec/psn_client/models/user_search_result_spec.rb"
     - "spec/psn_client/models/library_models_spec.rb"
 
 RSpec/MultipleExpectations:
