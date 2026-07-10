@@ -73,4 +73,42 @@ RSpec.describe "PSN catalog detail models" do
       expect(legal.privacy_policy).to eq("https://example.com/privacy")
     end
   end
+
+  describe PSN::Edition do
+    it "maps the product with its first CTA's type and price" do
+      edition = described_class.from_api(fixture("edition_product"))
+      expect(edition.name).to eq("Fable Standard Edition")
+      expect(edition.id).to eq("UP6312-PPSA31381_00-0202050640964065")
+      expect(edition.np_title_id).to eq("PPSA31381_00")
+      expect(edition.cta_type).to eq("PREORDER")
+      expect(edition.price).to be_a(PSN::Price)
+      expect(edition.price.base_price).to eq("£59.99")
+    end
+
+    it "has nil cta_type and price when there are no CTAs" do
+      edition = described_class.from_api({ "name" => "Demo" })
+      expect(edition.cta_type).to be_nil
+      expect(edition.price).to be_nil
+    end
+  end
+
+  describe PSN::PlusOffer do
+    it "maps plan, sku and price members" do
+      offer = described_class.from_api(fixture("plus_offer"))
+      expect(offer.title).to eq("1 Month Subscription")
+      expect(offer.duration).to eq("1-Month Plan")
+      expect(offer.sku_id).to eq("IP9102-PPSA06902_00-PLUS1T01M0000000-E004")
+      expect(offer.base_price_value).to eq(799)
+      expect(offer.discounted_price).to eq("£7.99")
+      expect(offer.currency_code).to eq("GBP")
+      expect(offer).not_to be_trial
+      expect(offer).not_to be_active_subscription
+    end
+
+    it "flags trials and tolerates a missing price" do
+      offer = described_class.from_api({ "title" => "Trial", "isTrial" => true })
+      expect(offer).to be_trial
+      expect(offer.base_price).to be_nil
+    end
+  end
 end

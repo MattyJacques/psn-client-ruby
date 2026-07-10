@@ -1,0 +1,53 @@
+{
+  "__typename": "Product",
+  "concept": { "__typename": "Concept", "id": "10015869" },
+  "id": "UP6312-PPSA31381_00-0202050640964065",
+  "invariantName": "Fable Standard Edition",
+  "isInWishlist": false,
+  "isWishlistable": true,
+  "name": "Fable Standard Edition",
+  "npTitleId": "PPSA31381_00",
+  "skus": [
+    { "__typename": "Sku", "id": "UP6312-PPSA31381_00-0202050640964065-E001", "name": "Game" }
+  ],
+  "webctas": [
+    {
+      "__typename": "GameCTA",
+      "action": {
+        "__typename": "Action",
+        "param": [
+          { "__typename": "ActionParam", "name": "skuId", "value": "UP6312-PPSA31381_00-0202050640964065-E001" }
+        ],
+        "type": "BUY_NOW"
+      },
+      "hasLinkedConsole": false,
+      "meta": {
+        "__typename": "CTAMeta",
+        "exclusive": false,
+        "ineligibilityReasons": [],
+        "playabilityDate": null,
+        "upSellService": "NONE"
+      },
+      "type": "PREORDER",
+      "price": {
+        "__typename": "Price",
+        "applicability": "APPLICABLE",
+        "basePrice": "£59.99",
+        "basePriceValue": 5999,
+        "campaignId": null,
+        "currencyCode": "GBP",
+        "discountText": null,
+        "discountedPrice": "£59.99",
+        "discountedValue": 5999,
+        "endTime": null,
+        "isExclusive": false,
+        "isFree": false,
+        "isTiedToSubscription": false,
+        "qualifications": [],
+        "rewardId": "",
+        "serviceBranding": ["NONE"],
+        "upsellText": null
+      }
+    }
+  ]
+}

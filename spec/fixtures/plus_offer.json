@@ -1,0 +1,26 @@
+{
+  "__typename": "SubscriptionOffer",
+  "ctaLabel": "Add to Cart",
+  "description": "Pay every month. Subscription continues until cancelled.",
+  "hasPromotionOffer": false,
+  "isActiveSubscription": false,
+  "isTrial": false,
+  "nextRenewalDate": "",
+  "price": {
+    "__typename": "SubscriptionPrice",
+    "basePrice": "£7.99",
+    "basePriceValue": 799,
+    "currencyCode": "GBP",
+    "discountText": "",
+    "discountType": "DISCOUNT_TYPE_DEFAULT",
+    "discountedPrice": "£7.99",
+    "discountedValue": 799,
+    "isFree": false,
+    "promotionEndDate": null,
+    "promotionStartDate": null
+  },
+  "skuId": "IP9102-PPSA06902_00-PLUS1T01M0000000-E004",
+  "subscriptionDuration": "1-Month Plan",
+  "title": "1 Month Subscription",
+  "type": "SUBSCRIBE"
+}
