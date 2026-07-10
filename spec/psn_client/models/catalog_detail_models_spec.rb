@@ -38,4 +38,39 @@ RSpec.describe "PSN catalog detail models" do
       expect(item).not_to be_image
     end
   end
+
+  describe PSN::CompatibilityNotices do
+    it "flattens per-platform maps into entry hashes, skipping nulls and __typename" do
+      notices = described_class.from_api(fixture("compatibility_concept"))
+      expect(notices.compatibility).to eq([{ platform: "Common", type: "NO_OF_PLAYERS", value: "1" }])
+      expect(notices.accessibility).to eq([{ platform: "Common", type: "SUBTITLES", value: "Available" }])
+    end
+
+    it "returns empty arrays when both maps are missing" do
+      notices = described_class.from_api({})
+      expect(notices.compatibility).to eq([])
+      expect(notices.accessibility).to eq([])
+      expect(notices.raw).to eq({})
+    end
+  end
+
+  describe PSN::LegalText do
+    it "keeps only LEGAL description entries with their subtypes" do
+      legal = described_class.from_api(fixture("legal_product"))
+      expect(legal.notices).to eq(
+        [{ sub_type: "SCEE_TOS",
+           text: "<br><br>Download of this product is subject to the PlayStation Network Terms of Service." },
+         { sub_type: "SCEE_HEALTH_TEXT",
+           text: "<br>See health warnings for important health information." }]
+      )
+      expect(legal.privacy_policy).to be_nil
+      expect(legal.publisher).to eq("Microsoft Corporation")
+    end
+
+    it "tolerates a product without descriptions" do
+      legal = described_class.from_api({ "privacyPolicy" => "https://example.com/privacy" })
+      expect(legal.notices).to eq([])
+      expect(legal.privacy_policy).to eq("https://example.com/privacy")
+    end
+  end
 end
