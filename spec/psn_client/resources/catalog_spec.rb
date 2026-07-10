@@ -236,4 +236,99 @@ RSpec.describe PSN::Resources::Catalog do
       expect(catalog.legal_text("10015869").notices).to eq([])
     end
   end
+
+  describe "#editions" do
+    it "maps each product to an Edition" do
+      response = { "data" => { "conceptRetrieve" => { "products" => [fixture("edition_product")] } } }
+      allow(connection).to receive(:graphql)
+        .with("conceptRetrieveForCtasWithPrice", { "conceptId" => "10015869" },
+              described_class::EDITIONS_HASH, host: :web)
+        .and_return(response)
+
+      editions = catalog.editions("10015869")
+      expect(editions.map(&:name)).to eq(["Fable Standard Edition"])
+      expect(editions.first.price.base_price).to eq("£59.99")
+    end
+
+    it "returns an empty array for an unknown concept" do
+      allow(connection).to receive(:graphql).and_return({ "data" => { "conceptRetrieve" => nil } })
+      expect(catalog.editions("10015869")).to eq([])
+    end
+  end
+
+  describe "#concept_for_product" do
+    it "resolves a product to its StoreConcept in one request" do
+      allow(connection).to receive(:graphql)
+        .with("metGetConceptByProductIdQuery", { "productId" => product_id },
+              described_class::CONCEPT_BY_PRODUCT_HASH, host: :web)
+        .and_return({ "data" => { "productRetrieve" => { "concept" => fixture("store_concept") } } })
+
+      concept = catalog.concept_for_product(product_id)
+      expect(concept).to be_a(PSN::StoreConcept)
+      expect(concept.name).to eq("Fable")
+    end
+
+    it "returns a hollow model for an unknown product" do
+      allow(connection).to receive(:graphql).and_return({ "data" => { "productRetrieve" => nil } })
+
+      concept = catalog.concept_for_product(product_id)
+      expect(concept.name).to be_nil
+      expect(concept.raw).to eq({})
+    end
+  end
+
+  describe "#add_ons_by_concept" do
+    let(:full_page) { { "data" => { "addOnProductsRetrieve" => { "addOnProducts" => [fixture("catalog_product")] } } } }
+    let(:empty_page) { { "data" => { "addOnProductsRetrieve" => { "addOnProducts" => [] } } } }
+
+    def stub_page(offset, response)
+      allow(connection).to receive(:graphql)
+        .with("getAddOnProductsByConcept",
+              { "conceptId" => "229601", "pageArgs" => { "size" => 50, "offset" => offset } },
+              described_class::CONCEPT_ADD_ONS_HASH, host: :web)
+        .and_return(response)
+    end
+
+    it "pages until an empty page (response has no total count)" do
+      stub_page(0, full_page)
+      stub_page(1, empty_page)
+
+      result = catalog.add_ons_by_concept(229_601).to_a
+      expect(result.size).to eq(1)
+      expect(result.first).to be_a(PSN::CatalogItem)
+      expect(connection).to have_received(:graphql).twice
+    end
+
+    it "is lazy: .first(1) only issues one request" do
+      stub_page(0, full_page)
+
+      expect(catalog.add_ons_by_concept("229601").first(1).size).to eq(1)
+      expect(connection).to have_received(:graphql).once
+    end
+  end
+
+  describe "#plus_offers" do
+    it "maps tier symbols to Sony tier labels and returns PlusOffers" do
+      response = { "data" => { "tierSelectorOffersRetrieve" => { "offers" => [fixture("plus_offer")] } } }
+      allow(connection).to receive(:graphql)
+        .with("featuresRetrieve", { "tierLabel" => "TIER_20" },
+              described_class::PLUS_OFFERS_HASH, host: :web)
+        .and_return(response)
+
+      offers = catalog.plus_offers(:extra)
+      expect(offers.first).to be_a(PSN::PlusOffer)
+      expect(offers.first.title).to eq("1 Month Subscription")
+    end
+
+    it "defaults to the essential tier and rejects unknown tiers" do
+      response = { "data" => { "tierSelectorOffersRetrieve" => { "offers" => [] } } }
+      allow(connection).to receive(:graphql)
+        .with("featuresRetrieve", { "tierLabel" => "TIER_10" },
+              described_class::PLUS_OFFERS_HASH, host: :web)
+        .and_return(response)
+
+      expect(catalog.plus_offers).to eq([])
+      expect { catalog.plus_offers(:mega) }.to raise_error(KeyError)
+    end
+  end
 end

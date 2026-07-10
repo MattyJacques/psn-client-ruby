@@ -36,6 +36,16 @@ module PSN
       COMPATIBILITY_HASH = "fb1a981a21d7a00ba72bd79d3998044d77207687a5aa1d3a17d90d7b7f3acb05"
       LEGAL_OPERATION = "wcaConceptRetrieveForLegalText"
       LEGAL_HASH = "b4c35dd0b4ec1541041699ac77e0f607d510d9b2b1e4ad9d2e743e1727f5aeb8"
+      EDITIONS_OPERATION = "conceptRetrieveForCtasWithPrice"
+      EDITIONS_HASH = "eab9d873f90d4ad98fd55f07b6a0a606e6b3925f2d03b70477234b79c1df30b5"
+      CONCEPT_BY_PRODUCT_OPERATION = "metGetConceptByProductIdQuery"
+      CONCEPT_BY_PRODUCT_HASH = "0a4c9f3693b3604df1c8341fdc3e481f42eeecf961a996baaa65e65a657a6433"
+      CONCEPT_ADD_ONS_OPERATION = "getAddOnProductsByConcept"
+      CONCEPT_ADD_ONS_HASH = "23c26f5664dfee6d0a88183f4a6ba624b5d7ad082cf1768fb1c0b7c17b8a477e"
+      PLUS_OFFERS_OPERATION = "featuresRetrieve"
+      PLUS_OFFERS_HASH = "010870e8b9269c5bcf06b60190edbf5229310d8fae5b86515ad73f05bd11c4d1"
+      # Sony's PS Plus tier labels (featuresRetrieve "tierLabel" variable).
+      PLUS_TIERS = { essential: "TIER_10", extra: "TIER_20", premium: "TIER_30" }.freeze
       # Store category UUIDs (from the web store's routes). Any other
       # category UUID string can be passed to #category directly.
       CATEGORIES = {
@@ -111,6 +121,41 @@ module PSN
       def legal_text(concept_id)
         response = graphql(LEGAL_OPERATION, { "conceptId" => concept_id.to_s }, LEGAL_HASH)
         LegalText.from_api(response.dig("data", "conceptRetrieve", "defaultProduct") || {})
+      end
+
+      # Every purchasable edition of a concept with its store CTA and price.
+      def editions(concept_id)
+        response = graphql(EDITIONS_OPERATION, { "conceptId" => concept_id.to_s }, EDITIONS_HASH)
+        products = response.dig("data", "conceptRetrieve", "products") || []
+        products.map { |product| Edition.from_api(product) }
+      end
+
+      # Resolve a product straight to its StoreConcept (one request, vs
+      # #product + #concept). Hollow model for an unknown product.
+      def concept_for_product(product_id)
+        response = graphql(CONCEPT_BY_PRODUCT_OPERATION, { "productId" => product_id },
+                           CONCEPT_BY_PRODUCT_HASH)
+        StoreConcept.from_api(response.dig("data", "productRetrieve", "concept") || {})
+      end
+
+      # DLC and add-ons keyed by concept (see #add_ons for the title-ID
+      # flavor). The response has no total count, so pages are fetched until
+      # an empty one comes back.
+      def add_ons_by_concept(concept_id)
+        paginator = Paginator.offset(page_size: PAGE_SIZE) do |size, offset|
+          variables = { "conceptId" => concept_id.to_s, "pageArgs" => { "size" => size, "offset" => offset } }
+          response = graphql(CONCEPT_ADD_ONS_OPERATION, variables, CONCEPT_ADD_ONS_HASH)
+          [response.dig("data", "addOnProductsRetrieve", "addOnProducts") || [], nil]
+        end
+        paginator.map { |product| CatalogItem.from_api(product) }
+      end
+
+      # PS Plus subscription offers for a tier (:essential, :extra, :premium).
+      def plus_offers(tier = :essential)
+        response = graphql(PLUS_OFFERS_OPERATION, { "tierLabel" => PLUS_TIERS.fetch(tier) },
+                           PLUS_OFFERS_HASH)
+        offers = response.dig("data", "tierSelectorOffersRetrieve", "offers") || []
+        offers.map { |offer| PlusOffer.from_api(offer) }
       end
 
       # DLC and add-ons for a title ID ("PPSA31381_00").
