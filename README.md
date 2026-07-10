@@ -65,6 +65,10 @@ client.devices.storage(platform: "PS5")   # => [PSN::ConsoleStorage]
 client.profiles.shareable_link            # => PSN::ShareableLink (URL + QR code)
 client.profiles.find.region               # => "GB" — decoded from the profile npId
 
+# Media gallery (authenticated account only)
+client.media.captures.first(10)        # PROVISIONAL: raw capture hashes (lazy)
+client.media.download_url(ugc_id)      # PROVISIONAL: raw tokenized-URL hash
+
 # Trophies
 client.trophies.summary                                  # level, counts
 client.trophies.titles.to_a                              # per-game progress

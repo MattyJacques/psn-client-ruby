@@ -193,6 +193,10 @@ section("Console storage") do
   end
 end
 
+section("Media captures (PROVISIONAL, raw)") do
+  puts client.media.captures.first(3).to_a.inspect[0, 500]
+end
+
 section("Shareable profile link") do
   link = client.profiles.shareable_link
   puts "#{link.url} qr=#{link.image_url}"

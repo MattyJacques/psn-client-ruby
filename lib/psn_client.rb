@@ -46,6 +46,7 @@ require_relative "psn_client/resources/profiles"
 require_relative "psn_client/resources/search"
 require_relative "psn_client/resources/social"
 require_relative "psn_client/resources/devices"
+require_relative "psn_client/resources/media"
 require_relative "psn_client/resources/catalog"
 require_relative "psn_client/client"
 
