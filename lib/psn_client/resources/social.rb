@@ -48,11 +48,11 @@ module PSN
         id_pages(BLOCKS_PATH, "blockList")
       end
 
-      # PROVISIONAL: friendship summary between the authenticated account and
-      # another user. Returns the raw response body until the payload shape is
-      # confirmed via bin/smoke; the model mapping lands once that is known.
+      # Friendship summary between the authenticated account and another user
+      # (shape verified live 2026-07-10).
       def friendship(online_id)
-        @connection.get(:mobile, format(FRIENDSHIP_PATH, @users.account_id(online_id)), {})
+        response = @connection.get(:mobile, format(FRIENDSHIP_PATH, @users.account_id(online_id)), {})
+        FriendshipSummary.from_api(response)
       end
 
       # PROVISIONAL: friends currently available to play. Raw body; verified

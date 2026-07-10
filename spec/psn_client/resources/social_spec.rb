@@ -80,14 +80,32 @@ RSpec.describe PSN::Resources::Social do
   end
 
   describe "#friendship" do
-    it "returns the raw friendship summary body (provisional mapping)" do
-      body = { "friendRelation" => "friend", "personalDetailSharing" => "none" }
+    it "maps the summary to a FriendshipSummary" do
       allow(users).to receive(:account_id).with("friend").and_return("42")
       allow(connection).to receive(:get)
         .with(:mobile, "/api/userProfile/v1/internal/users/me/friends/42/summary", {})
-        .and_return(body)
+        .and_return(fixture("friendship"))
 
-      expect(social.friendship("friend")).to eq(body)
+      summary = social.friendship("friend")
+      expect(summary).to be_a(PSN::FriendshipSummary)
+      expect(summary.personal_detail_sharing).to eq("none")
+      expect(summary.friends_count).to eq(14)
+      expect(summary.mutual_friends_count).to eq(0)
+      expect(summary.raw).to eq(fixture("friendship"))
+    end
+
+    it "answers friend? from the relation" do
+      allow(users).to receive(:account_id).with("friend").and_return("42")
+      allow(users).to receive(:account_id).with("stranger").and_return("43")
+      allow(connection).to receive(:get)
+        .with(:mobile, "/api/userProfile/v1/internal/users/me/friends/42/summary", {})
+        .and_return(fixture("friendship"))
+      allow(connection).to receive(:get)
+        .with(:mobile, "/api/userProfile/v1/internal/users/me/friends/43/summary", {})
+        .and_return({ "friendRelation" => "no-relationship" })
+
+      expect(social.friendship("friend")).to be_friend
+      expect(social.friendship("stranger")).not_to be_friend
     end
   end
 
