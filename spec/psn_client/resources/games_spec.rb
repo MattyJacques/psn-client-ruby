@@ -101,8 +101,16 @@ RSpec.describe PSN::Resources::Games do
       expect(result.first.online_id).to eq("player-one")
       expect(result.first.display_name).to eq("Player One")
       expect(result.first.avatar_url).to eq("https://example.com/avatar-one-large.png")
-      expect(result.first).to be_ps_plus
-      expect(result.first).not_to be_verified
+    end
+
+    it "maps subscription and verification flags" do
+      allow(connection).to receive(:graphql).and_return(fixture("friends_who_play"))
+
+      first, second = games.friends_who_play(10_015_869)
+      expect(first).to be_ps_plus
+      expect(first).not_to be_verified
+      expect(second).to be_verified
+      expect(second).not_to be_ps_plus
     end
 
     it "leaves account_id nil and falls back to the small avatar" do
@@ -111,8 +119,6 @@ RSpec.describe PSN::Resources::Games do
       second = games.friends_who_play(10_015_869).last
       expect(second.account_id).to be_nil
       expect(second.avatar_url).to eq("https://example.com/avatar-two-small.png")
-      expect(second).to be_verified
-      expect(second).not_to be_ps_plus
       expect(second.raw).to eq(fixture("friends_who_play").dig("data", "gameListFriendsOwningGame", "profiles").last)
     end
 
