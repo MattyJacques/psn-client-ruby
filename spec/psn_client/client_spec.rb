@@ -11,22 +11,22 @@ RSpec.describe PSN::Client do
     )
   end
 
-  it "exposes memoized resource objects" do # rubocop:disable RSpec/MultipleExpectations
+  it "exposes memoized resource objects" do
     client = described_class.new(refresh_token: "RT-0")
     expect(client.games).to be_a(PSN::Resources::Games)
     expect(client.trophies).to be_a(PSN::Resources::Trophies)
     expect(client.store).to be_a(PSN::Resources::Store)
     expect(client.profiles).to be_a(PSN::Resources::Profiles)
     expect(client.search).to equal(client.search)
-    expect(client.social).to be_a(PSN::Resources::Social)
-    expect(client.social).to equal(client.social)
   end
 
-  it "exposes the search and catalog resources" do
+  it "exposes the search, catalog and social resources" do
     client = described_class.new(refresh_token: "RT-0")
     expect(client.search).to be_a(PSN::Resources::Search)
     expect(client.catalog).to be_a(PSN::Resources::Catalog)
     expect(client.catalog).to equal(client.catalog)
+    expect(client.social).to be_a(PSN::Resources::Social)
+    expect(client.social).to equal(client.social)
   end
 
   it "requires exactly one credential" do
