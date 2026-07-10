@@ -1,0 +1,44 @@
+{
+  "data": {
+    "gameListFriendsOwningGame": {
+      "__typename": "GameListFriendsOwningGame",
+      "pageInfo": {
+        "__typename": "PageInfo",
+        "offset": 0,
+        "totalCount": 2
+      },
+      "profiles": [
+        {
+          "__typename": "Profile",
+          "avatar": {
+            "__typename": "Media",
+            "altText": null,
+            "url": "https://example.com/avatar-one-small.png"
+          },
+          "isOfficiallyVerified": false,
+          "isPsPlusMember": true,
+          "name": "Player One",
+          "onlineId": "player-one",
+          "profilePicture": {
+            "__typename": "Media",
+            "altText": null,
+            "url": "https://example.com/avatar-one-large.png"
+          }
+        },
+        {
+          "__typename": "Profile",
+          "avatar": {
+            "__typename": "Media",
+            "altText": null,
+            "url": "https://example.com/avatar-two-small.png"
+          },
+          "isOfficiallyVerified": true,
+          "isPsPlusMember": false,
+          "name": "Player Two",
+          "onlineId": "player_two",
+          "profilePicture": null
+        }
+      ]
+    }
+  }
+}

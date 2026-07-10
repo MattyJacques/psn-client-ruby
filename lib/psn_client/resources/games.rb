@@ -73,13 +73,15 @@ module PSN
         paginator.map { |game| PurchasedGame.from_api(game) }
       end
 
-      # PROVISIONAL: friends of the authenticated account who play a concept.
-      # Returns the raw response body until the payload shape is confirmed
-      # via bin/smoke (needs an authenticated account with friends); the
-      # model mapping lands once that shape is known.
+      # Friends of the authenticated account who play a concept. The persisted
+      # query accepts no paging variables — Sony returns a single page (its
+      # totalCount matched the profile count when verified live 2026-07-10).
+      # Profiles carry no accountId, so User#account_id is nil here.
       def friends_who_play(concept_id)
-        @connection.graphql(FRIENDS_WHO_PLAY_OPERATION, { "conceptId" => concept_id.to_s },
-                            FRIENDS_WHO_PLAY_HASH, host: :web)
+        response = @connection.graphql(FRIENDS_WHO_PLAY_OPERATION, { "conceptId" => concept_id.to_s },
+                                       FRIENDS_WHO_PLAY_HASH, host: :web)
+        profiles = response.dig("data", "gameListFriendsOwningGame", "profiles") || []
+        profiles.map { |profile| User.from_api(profile) }
       end
     end
   end

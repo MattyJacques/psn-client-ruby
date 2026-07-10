@@ -140,10 +140,12 @@ section("Catalog: PS Plus offers (essential tier)") do
   client.catalog.plus_offers.each { |o| puts "#{o.title} #{o.discounted_price} trial=#{o.trial?}" }
 end
 
-section("Friends who play (PROVISIONAL, raw body)") do
+section("Friends who play") do
   hit = client.search.games("astro bot").first(1).first
   concept = client.catalog.concept_for_product(hit.id)
-  puts client.games.friends_who_play(concept.id).inspect[0, 500]
+  players = client.games.friends_who_play(concept.id)
+  puts "#{players.size} friends"
+  players.first(5).each { |u| puts "#{u.online_id} (#{u.display_name}) plus=#{u.ps_plus?}" }
 end
 
 section("Game Help for ASTRO's PLAYROOM (NPWR20188_00)") do
@@ -165,10 +167,12 @@ section("5 friends / requests / blocked") do
   puts "blocked: #{client.social.blocked.first(5).to_a.inspect}"
 end
 
-section("Friendship summary (PROVISIONAL, raw body; set PSN_FRIEND_ID)") do
+section("Friendship summary (set PSN_FRIEND_ID)") do
   friend = ENV.fetch("PSN_FRIEND_ID", nil)
   if friend
-    puts client.social.friendship(friend).inspect[0, 500]
+    summary = client.social.friendship(friend)
+    puts "relation=#{summary.friend_relation} friends=#{summary.friends_count} " \
+         "mutual=#{summary.mutual_friends_count} sharing=#{summary.personal_detail_sharing}"
   else
     puts "skipped (set PSN_FRIEND_ID to a friend's online ID)"
   end
@@ -182,8 +186,15 @@ section("Devices") do
   client.devices.all.each { |d| puts "#{d.device_type} #{d.activation_type} activated=#{d.activated_at}" }
 end
 
-section("Console storage (PROVISIONAL, raw body)") do
-  puts client.devices.storage.inspect[0, 500]
+section("Console storage") do
+  client.devices.storage.each do |console|
+    free_gb = (console.free_bytes / 1e9).round(1)
+    total_gb = (console.total_bytes / 1e9).round(1)
+    puts "#{console.name} [#{console.platform}] #{free_gb}GB free of #{total_gb}GB"
+    console.installed_titles.first(3).each do |title|
+      puts "  #{title.name} #{(title.size_bytes / 1e9).round(1)}GB last=#{title.last_played_at}"
+    end
+  end
 end
 
 section("Shareable profile link") do
@@ -195,9 +206,9 @@ section("Profile region") do
   puts client.profiles.find.region.inspect
 end
 
-section("Catalog: concept for most recent played title (PROVISIONAL, raw body)") do
+section("Catalog: concept for most recent played title") do
   id = client.games.played.first(1).first.title_id
-  puts client.catalog.concept_for_title(id).inspect[0, 500]
+  client.catalog.concept_for_title(id).each { |c| puts "#{c.id} #{c.name} titles=#{c.title_ids.size}" }
 end
 
 puts "\nRefresh token (persist for next session):"

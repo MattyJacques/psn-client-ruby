@@ -1,0 +1,64 @@
+{
+  "clients": [
+    {
+      "device": {
+        "language": "en-GB",
+        "name": "PS5-001",
+        "updatedDateTime": "2026-07-04T20:26:04Z",
+        "wakeupEnabledPowerModes": ["networkStandby", "mainOnStandby"],
+        "enabledFeatures": ["remotePlay"]
+      },
+      "duid": "00000007000a00c0000000000000000000000000000000000000000000000000",
+      "platform": "PS5",
+      "deviceProperties": [],
+      "systemData": {
+        "icons": {
+          "titles": [],
+          "updatedDateTime": "2026-07-04T20:26:04Z"
+        },
+        "installedTitles": {
+          "titles": [
+            {
+              "comment": "ASTRO's PLAYROOM",
+              "conceptId": "10000237",
+              "contentPriority": "prior",
+              "disc": "inapplicable",
+              "displayLocationSpace": "game",
+              "lastAccessDateTime": "2026-06-16T21:15:47Z",
+              "npTitleId": "PPSA01325_00",
+              "psPlatform": "PS5",
+              "size": 63853625344,
+              "storage": "embedded",
+              "titleId": "PPSA01325",
+              "version": "01.000.028"
+            },
+            {
+              "comment": "Rocket League®",
+              "conceptId": "203715",
+              "contentPriority": "prior",
+              "disc": "inapplicable",
+              "displayLocationSpace": "game",
+              "lastAccessDateTime": "2026-05-27T19:02:57Z",
+              "npTitleId": "CUSA01433_00",
+              "psPlatform": "PS4",
+              "size": 48038477824,
+              "storage": "embedded",
+              "titleId": "CUSA01433",
+              "version": "01.00"
+            }
+          ],
+          "updatedDateTime": "2026-07-04T20:26:04Z"
+        },
+        "storage": {
+          "embedded": {
+            "freeSize": 1550405074944,
+            "totalSize": 1887699992576
+          },
+          "updatedDateTime": "2026-07-04T20:26:04Z"
+        }
+      },
+      "updatedDateTime": "2026-07-04T20:26:05Z",
+      "version": "7"
+    }
+  ]
+}
