@@ -141,14 +141,14 @@ module PSN
         StoreConcept.from_api(response.dig("data", "productRetrieve", "concept") || {})
       end
 
-      # PROVISIONAL: resolve an npTitleId ("CUSA01433_00") to its concept via
-      # the mobile app's catalog — the reverse direction of the trophy/game
-      # list surfaces. Returns the raw response body: a top-level ARRAY of
-      # concept hashes ("id", "nameEn", "titleIds", ...) — verified live
-      # 2026-07-10 — which does not match the GraphQL StoreConcept shape, so
-      # a dedicated model mapping is a follow-up.
+      # Resolve an npTitleId ("CUSA01433_00") to its concept(s) via the mobile
+      # app's catalog — the reverse direction of the trophy/game list surfaces.
+      # The response is a top-level ARRAY of concept hashes (verified live
+      # 2026-07-10) whose shape differs from the GraphQL StoreConcept, hence the
+      # dedicated TitleConcept model.
       def concept_for_title(np_title_id)
-        @connection.get(:mobile, format(TITLE_CONCEPT_PATH, np_title_id), {})
+        response = @connection.get(:mobile, format(TITLE_CONCEPT_PATH, np_title_id), {})
+        response.map { |concept| TitleConcept.from_api(concept) }
       end
 
       # DLC and add-ons keyed by concept (see #add_ons for the title-ID

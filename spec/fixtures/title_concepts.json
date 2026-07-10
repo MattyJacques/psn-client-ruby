@@ -1,0 +1,28 @@
+[
+  {
+    "id": 10000562,
+    "nameEn": "Battlefield™ 2042",
+    "titleIds": ["PPSA01465_00", "CUSA23249_00"],
+    "country": "",
+    "language": "",
+    "type": "GAME",
+    "localizedName": {
+      "defaultLanguage": "en-US",
+      "metadata": {
+        "en-US": "Battlefield™ 2042",
+        "ja-JP": "Battlefield™ 2042"
+      }
+    }
+  },
+  {
+    "id": 10000563,
+    "nameEn": null,
+    "type": "GAME",
+    "localizedName": {
+      "defaultLanguage": "en-US",
+      "metadata": {
+        "en-US": "Localized Only Game"
+      }
+    }
+  }
+]

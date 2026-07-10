@@ -333,14 +333,33 @@ RSpec.describe PSN::Resources::Catalog do
   end
 
   describe "#concept_for_title" do
-    it "returns the raw mobile catalog body (provisional mapping)" do
-      # Real responses are a top-level array of concepts (verified live 2026-07-10).
-      body = [{ "id" => 10_015_869, "nameEn" => "ASTRO BOT", "titleIds" => %w[PPSA01325_00] }]
+    it "maps the top-level concept array to TitleConcept models" do
       allow(connection).to receive(:get)
         .with(:mobile, "/api/catalog/v2/titles/CUSA01433_00/concepts", {})
-        .and_return(body)
+        .and_return(fixture("title_concepts"))
 
-      expect(catalog.concept_for_title("CUSA01433_00")).to eq(body)
+      result = catalog.concept_for_title("CUSA01433_00")
+      expect(result.size).to eq(2)
+      expect(result.first).to be_a(PSN::TitleConcept)
+      expect(result.first.id).to eq(10_000_562)
+      expect(result.first.name).to eq("Battlefield™ 2042")
+      expect(result.first.type).to eq("GAME")
+    end
+
+    it "maps title_ids and keeps the raw concept" do
+      allow(connection).to receive(:get).and_return(fixture("title_concepts"))
+
+      first = catalog.concept_for_title("CUSA01433_00").first
+      expect(first.title_ids).to eq(%w[PPSA01465_00 CUSA23249_00])
+      expect(first.raw).to eq(fixture("title_concepts").first)
+    end
+
+    it "falls back to the default-language localized name and defaults title_ids" do
+      allow(connection).to receive(:get).and_return(fixture("title_concepts"))
+
+      fallback = catalog.concept_for_title("CUSA01433_00").last
+      expect(fallback.name).to eq("Localized Only Game")
+      expect(fallback.title_ids).to eq([])
     end
   end
 end
