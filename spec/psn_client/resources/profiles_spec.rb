@@ -1,9 +1,10 @@
 # frozen_string_literal: true
 
 RSpec.describe PSN::Resources::Profiles do
-  subject(:profiles) { described_class.new(connection) }
+  subject(:profiles) { described_class.new(connection, users) }
 
   let(:connection) { instance_double(PSN::Connection) }
+  let(:users) { instance_double(PSN::Resources::Users) }
 
   it "fetches a profile by online ID from the community host" do
     allow(connection).to receive(:get)
@@ -54,5 +55,44 @@ RSpec.describe PSN::Resources::Profiles do
       .and_return({ "profile" => fixture("profile") })
 
     expect { profiles.find("a_b-1") }.not_to raise_error
+  end
+
+  describe "#shareable_link" do
+    it "resolves the own account ID via DMS and fetches the cpss share link" do
+      allow(connection).to receive(:get).with(:dms, "/api/v1/devices/accounts/me", {})
+                                        .and_return({ "accountId" => "7077443169688056897" })
+      allow(connection).to receive(:get)
+        .with(:mobile, "/api/cpss/v1/share/profile/7077443169688056897", {})
+        .and_return({ "shareUrl" => "https://profile.playstation.com/x/abc",
+                      "shareImageUrl" => "https://image/qr.png",
+                      "shareImageUrlDestination" => "https://profile.playstation.com/abc" })
+
+      link = profiles.shareable_link
+      expect(link).to be_a(PSN::ShareableLink)
+      expect(link.url).to eq("https://profile.playstation.com/x/abc")
+      expect(link.image_url).to eq("https://image/qr.png")
+      expect(link.destination).to eq("https://profile.playstation.com/abc")
+    end
+
+    it "resolves another user's account ID without touching DMS" do
+      allow(users).to receive(:account_id).with("friend").and_return("42")
+      allow(connection).to receive(:get)
+        .with(:mobile, "/api/cpss/v1/share/profile/42", {})
+        .and_return({ "shareUrl" => "u", "shareImageUrl" => "i", "shareImageUrlDestination" => "d" })
+
+      expect(profiles.shareable_link("friend").url).to eq("u")
+      expect(connection).not_to have_received(:get).with(:dms, anything, anything)
+    end
+
+    it "memoizes the own account ID across calls" do
+      allow(connection).to receive(:get).with(:dms, "/api/v1/devices/accounts/me", {})
+                                        .and_return({ "accountId" => "7" })
+      allow(connection).to receive(:get)
+        .with(:mobile, "/api/cpss/v1/share/profile/7", {})
+        .and_return({ "shareUrl" => "u", "shareImageUrl" => "i", "shareImageUrlDestination" => "d" })
+
+      2.times { profiles.shareable_link }
+      expect(connection).to have_received(:get).with(:dms, "/api/v1/devices/accounts/me", {}).once
+    end
   end
 end
