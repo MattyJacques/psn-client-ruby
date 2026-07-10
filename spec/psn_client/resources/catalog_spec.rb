@@ -334,7 +334,8 @@ RSpec.describe PSN::Resources::Catalog do
 
   describe "#concept_for_title" do
     it "returns the raw mobile catalog body (provisional mapping)" do
-      body = { "concepts" => [{ "conceptId" => "10015869" }] }
+      # Real responses are a top-level array of concepts (verified live 2026-07-10).
+      body = [{ "id" => 10_015_869, "nameEn" => "ASTRO BOT", "titleIds" => %w[PPSA01325_00] }]
       allow(connection).to receive(:get)
         .with(:mobile, "/api/catalog/v2/titles/CUSA01433_00/concepts", {})
         .and_return(body)

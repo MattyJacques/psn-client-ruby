@@ -26,8 +26,10 @@ module PSN
 
       # PROVISIONAL: console storage usage. andshrew's Console.md documents a
       # single platform value (e.g. "PS5"); whether lists work is unverified.
-      # Returns the raw response body until the payload shape is confirmed
-      # via bin/smoke; the model mapping lands once that is known.
+      # Returns the raw response body — verified live 2026-07-10: {"clients"
+      # => [...]}, one entry per console, with byte counts under
+      # systemData.storage.embedded ("freeSize"/"totalSize") alongside icons
+      # and installedTitles. The model mapping is a follow-up.
       def storage(platform: "PS5")
         params = { "includeFields" => "device,systemData", "platform" => platform }
         @connection.get(:mobile, STORAGE_PATH, params, headers: STORAGE_HEADERS)

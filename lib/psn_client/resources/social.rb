@@ -55,8 +55,10 @@ module PSN
         @connection.get(:mobile, format(FRIENDSHIP_PATH, @users.account_id(online_id)), {})
       end
 
-      # PROVISIONAL: friends currently available to play. Raw body until the
-      # payload shape is confirmed via bin/smoke.
+      # PROVISIONAL: friends currently available to play. Raw body; verified
+      # live 2026-07-10 it returned {"settings" => []} (a settings array, not
+      # a friends list), so the model mapping waits until the populated shape
+      # is seen.
       def available_to_play
         @connection.get(:mobile, AVAILABLE_PATH, {})
       end

@@ -143,9 +143,10 @@ module PSN
 
       # PROVISIONAL: resolve an npTitleId ("CUSA01433_00") to its concept via
       # the mobile app's catalog — the reverse direction of the trophy/game
-      # list surfaces. Returns the raw response body until the payload shape
-      # is confirmed via bin/smoke; if it matches StoreConcept the mapping
-      # will reuse it.
+      # list surfaces. Returns the raw response body: a top-level ARRAY of
+      # concept hashes ("id", "nameEn", "titleIds", ...) — verified live
+      # 2026-07-10 — which does not match the GraphQL StoreConcept shape, so
+      # a dedicated model mapping is a follow-up.
       def concept_for_title(np_title_id)
         @connection.get(:mobile, format(TITLE_CONCEPT_PATH, np_title_id), {})
       end
