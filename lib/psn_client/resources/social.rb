@@ -11,6 +11,8 @@ module PSN
       FRIENDS_PATH = "/api/userProfile/v1/internal/users/%s/friends"
       REQUESTS_PATH = "/api/userProfile/v1/internal/users/me/friends/receivedRequests"
       BLOCKS_PATH = "/api/userProfile/v1/internal/users/me/blocks"
+      FRIENDSHIP_PATH = "/api/userProfile/v1/internal/users/me/friends/%s/summary"
+      AVAILABLE_PATH = "/api/userProfile/v1/internal/users/me/friends/subscribing/availableToPlay"
       # No server-side cap has been verified live for these list endpoints;
       # 100 is a conservative page size, not a known limit.
       PAGE_SIZE = 100
@@ -44,6 +46,19 @@ module PSN
       # carries no totalItemCount, so paging stops on the first empty page.
       def blocked
         id_pages(BLOCKS_PATH, "blockList")
+      end
+
+      # PROVISIONAL: friendship summary between the authenticated account and
+      # another user. Returns the raw response body until the payload shape is
+      # confirmed via bin/smoke; the model mapping lands once that is known.
+      def friendship(online_id)
+        @connection.get(:mobile, format(FRIENDSHIP_PATH, @users.account_id(online_id)), {})
+      end
+
+      # PROVISIONAL: friends currently available to play. Raw body until the
+      # payload shape is confirmed via bin/smoke.
+      def available_to_play
+        @connection.get(:mobile, AVAILABLE_PATH, {})
       end
 
       private

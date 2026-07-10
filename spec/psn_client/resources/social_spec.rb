@@ -78,4 +78,27 @@ RSpec.describe PSN::Resources::Social do
       expect(connection).to have_received(:get).twice
     end
   end
+
+  describe "#friendship" do
+    it "returns the raw friendship summary body (provisional mapping)" do
+      body = { "friendRelation" => "friend", "personalDetailSharing" => "none" }
+      allow(users).to receive(:account_id).with("friend").and_return("42")
+      allow(connection).to receive(:get)
+        .with(:mobile, "/api/userProfile/v1/internal/users/me/friends/42/summary", {})
+        .and_return(body)
+
+      expect(social.friendship("friend")).to eq(body)
+    end
+  end
+
+  describe "#available_to_play" do
+    it "returns the raw availability body (provisional mapping)" do
+      body = { "availableToPlay" => [] }
+      allow(connection).to receive(:get)
+        .with(:mobile, "/api/userProfile/v1/internal/users/me/friends/subscribing/availableToPlay", {})
+        .and_return(body)
+
+      expect(social.available_to_play).to eq(body)
+    end
+  end
 end
