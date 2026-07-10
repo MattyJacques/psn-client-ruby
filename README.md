@@ -75,7 +75,7 @@ client.trophies.groups(np_communication_id: "NPWR20188_00")  # base game vs DLC
 
 # Purchases and wishlist (authenticated account only)
 # client.store.transactions raises PSN::APIError — Sony decommissioned the endpoint
-client.store.entitlements.to_a       # everything owned incl. free claims
+client.store.entitlements.to_a       # everything owned incl. free claims (PS4/PS5)
 client.store.wishlist.to_a           # store wishlist incl. unreleased concepts
 
 # Search the store and players

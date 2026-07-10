@@ -7,8 +7,17 @@ module PSN
     # of their hosts, paths and response keys is confined to this file so a
     # change only lands here (and in the store models). Verify with bin/smoke.
     class Store
-      ENTITLEMENTS_HOST = :web
-      ENTITLEMENTS_PATH = "/api/entitlements/v2/users/me/internal_entitlements"
+      # The mobile-app entitlements endpoint (the old :web
+      # /api/entitlements/v2/users/me/internal_entitlements is edge-blocked
+      # like the transactions endpoint). Serves PS4/PS5 entitlements only —
+      # the app API does not return PS3/Vita items.
+      ENTITLEMENTS_PATH = "/api/entitlement/v2/users/me/internal/entitlements"
+      ENTITLEMENTS_PARAMS = {
+        "entitlementType" => "1,2,3,4,5",
+        "fields" => "titleMeta,gameMeta,conceptMeta,rewardMeta," \
+                    "rewardMeta.retentionPolicy,rewardMeta.rewardMembershipType",
+        "gameMetaPackageType" => "PSGD,PS4GD"
+      }.freeze
       PAGE_SIZE = 50
       # metGetStoreWishlist persisted query. Sony can change hash and shape
       # at any time; verify with bin/smoke. Takes no variables — the whole
@@ -33,12 +42,14 @@ module PSN
         raise APIError, TRANSACTIONS_ERROR
       end
 
-      # Everything the account owns: games, DLC, free claims.
-      def entitlements
+      # Everything the account owns on PS4/PS5: games, DLC, free claims.
+      # title_ids: optional title-ID filter (Array or comma-separated String).
+      def entitlements(title_ids: nil)
+        extra = title_ids ? { "titleId" => Array(title_ids).join(",") } : {}
         paginator = Paginator.offset(page_size: PAGE_SIZE) do |limit, offset|
-          response = @connection.get(ENTITLEMENTS_HOST, ENTITLEMENTS_PATH,
-                                     { "limit" => limit, "offset" => offset })
-          [response["entitlements"] || [], response["total_results"]]
+          response = @connection.get(:mobile, ENTITLEMENTS_PATH,
+                                     ENTITLEMENTS_PARAMS.merge(extra, { "limit" => limit, "offset" => offset }))
+          [response["entitlements"] || [], response["totalResults"]]
         end
         paginator.map { |e| Entitlement.from_api(e) }
       end
