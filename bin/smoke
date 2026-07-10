@@ -197,6 +197,18 @@ section("Media captures (PROVISIONAL, raw)") do
   puts client.media.captures.first(3).to_a.inspect[0, 500]
 end
 
+section("3 groups + last messages") do
+  client.groups.all.first(3).each do |g|
+    last = g.latest_message
+    puts "#{g.name || '(unnamed)'} members=#{g.members.size} " \
+         "last=#{last&.sender_online_id}: #{last&.body&.slice(0, 40)}"
+  end
+  group = client.groups.all.first(1).first
+  if group
+    client.groups.messages(group.id).first(3).each { |m| puts "  #{m.created_at} #{m.sender_online_id}: #{m.body}" }
+  end
+end
+
 section("Shareable profile link") do
   link = client.profiles.shareable_link
   puts "#{link.url} qr=#{link.image_url}"

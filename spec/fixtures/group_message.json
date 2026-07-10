@@ -1,0 +1,11 @@
+{
+  "messageUid": "9#100000000000001",
+  "messageType": 1,
+  "alternativeMessageType": 1,
+  "body": "Hello world",
+  "createdTimestamp": "1751980000000",
+  "sender": {
+    "accountId": "9876543210987654321",
+    "onlineId": "example_friend"
+  }
+}

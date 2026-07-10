@@ -69,6 +69,11 @@ client.profiles.find.region               # => "GB" — decoded from the profile
 client.media.captures.first(10)        # PROVISIONAL: raw capture hashes (lazy)
 client.media.download_url(ugc_id)      # PROVISIONAL: raw tokenized-URL hash
 
+# Message groups (read-only, authenticated account only)
+client.groups.all.first(10)                 # => PSN::Group DMs and group chats (lazy)
+client.groups.find(group_id)                # => PSN::Group with members + latest message
+client.groups.messages(group_id).first(20)  # => PSN::GroupMessage, newest first (lazy)
+
 # Trophies
 client.trophies.summary                                  # level, counts
 client.trophies.titles.to_a                              # per-game progress

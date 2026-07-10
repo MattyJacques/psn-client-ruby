@@ -5,6 +5,8 @@ plugins:
 AllCops:
   TargetRubyVersion: 3.2
   NewCops: enable
+  Exclude:
+    - "docs/superpowers/**/*" # gitignored scratch/planning material (probe scripts etc.)
 
 Style/Documentation:
   Enabled: false
@@ -42,6 +44,7 @@ RSpec/DescribeClass:
     - "spec/psn_client/models/store_models_spec.rb"
     - "spec/psn_client/models/library_models_spec.rb"
     - "spec/psn_client/models/catalog_detail_models_spec.rb"
+    - "spec/psn_client/models/group_models_spec.rb"
 
 RSpec/SpecFilePathFormat:
   CustomTransform:

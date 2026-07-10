@@ -11,6 +11,11 @@ module PSN
       value && Time.iso8601(value)
     end
 
+    # Sony epoch-milliseconds string ("1751980000000") -> UTC Time.
+    def epoch_ms(value)
+      value && Time.at(Rational(value.to_i, 1000)).utc
+    end
+
     # "PT15H2M32S" -> 54152 (seconds)
     def duration_seconds(value)
       return nil unless value
