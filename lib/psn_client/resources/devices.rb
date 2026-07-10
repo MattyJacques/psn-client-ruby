@@ -24,15 +24,14 @@ module PSN
         (response["accountDevices"] || []).map { |device| Device.from_api(device) }
       end
 
-      # PROVISIONAL: console storage usage. andshrew's Console.md documents a
-      # single platform value (e.g. "PS5"); whether lists work is unverified.
-      # Returns the raw response body — verified live 2026-07-10: {"clients"
-      # => [...]}, one entry per console, with byte counts under
-      # systemData.storage.embedded ("freeSize"/"totalSize") alongside icons
-      # and installedTitles. The model mapping is a follow-up.
+      # Console storage usage, one ConsoleStorage per console. andshrew's
+      # Console.md documents a single platform value (e.g. "PS5"); whether lists
+      # work is unverified. Byte counts come from systemData.storage.embedded
+      # (verified live 2026-07-10).
       def storage(platform: "PS5")
         params = { "includeFields" => "device,systemData", "platform" => platform }
-        @connection.get(:mobile, STORAGE_PATH, params, headers: STORAGE_HEADERS)
+        response = @connection.get(:mobile, STORAGE_PATH, params, headers: STORAGE_HEADERS)
+        (response["clients"] || []).map { |client| ConsoleStorage.from_api(client) }
       end
     end
   end
