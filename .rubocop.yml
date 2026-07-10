@@ -37,6 +37,7 @@ RSpec/DescribeClass:
     - "spec/psn_client/models/trophy_models_spec.rb"
     - "spec/psn_client/models/store_models_spec.rb"
     - "spec/psn_client/models/library_models_spec.rb"
+    - "spec/psn_client/models/catalog_detail_models_spec.rb"
 
 RSpec/SpecFilePathFormat:
   CustomTransform:
