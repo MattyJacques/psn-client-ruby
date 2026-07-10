@@ -21,6 +21,7 @@ module PSN
     def search = @search ||= Resources::Search.new(@connection)
     def catalog = @catalog ||= Resources::Catalog.new(@connection)
     def social = @social ||= Resources::Social.new(@connection, users)
+    def devices = @devices ||= Resources::Devices.new(@connection)
 
     # Triggers authentication if it has not happened yet.
     def access_token = @auth.access_token

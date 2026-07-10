@@ -29,6 +29,11 @@ RSpec.describe PSN::Client do
     expect(client.social).to equal(client.social)
   end
 
+  it "exposes the devices resource" do
+    client = described_class.new(refresh_token: "RT-0")
+    expect(client.devices).to be_a(PSN::Resources::Devices)
+  end
+
   it "requires exactly one credential" do
     expect { described_class.new }.to raise_error(ArgumentError)
   end
