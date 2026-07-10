@@ -31,8 +31,8 @@ module PSN
       end
 
       # Account IDs on the user's friends list, as bare strings — the payload
-      # carries no profile data; hydrate via profiles/search as needed. 403 on
-      # a privacy-restricted account surfaces as PSN::PrivacyError.
+      # carries no profile data. A public account-ID→profile lookup is a possible
+      # follow-up. 403 on a privacy-restricted account surfaces as PSN::PrivacyError.
       def friends(online_id = nil)
         id_pages(format(FRIENDS_PATH, @users.account_id(online_id)), "friends")
       end

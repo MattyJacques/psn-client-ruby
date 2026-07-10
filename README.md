@@ -49,7 +49,7 @@ client.profiles.find                      # authenticated account
 client.profiles.find("a_friend")          # avatar, PS Plus, presence, trophy level
 
 # Social graph and presence
-client.social.friends.first(10)           # account IDs (lazy); hydrate via search/profiles
+client.social.friends.first(10)           # account IDs (lazy), as bare strings
 client.social.presence("a_friend")        # => PSN::Presence: online?, platform, now_playing
 client.social.friend_requests.to_a        # incoming requests (account IDs)
 client.social.blocked.to_a                # blocked account IDs
