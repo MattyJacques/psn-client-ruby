@@ -2,6 +2,12 @@ plugins:
   - rubocop-rake
   - rubocop-rspec
 
+# Merge our Exclude with RuboCop's defaults (vendor/**/* etc.) instead of
+# replacing them — CI installs gems to vendor/bundle and must stay excluded.
+inherit_mode:
+  merge:
+    - Exclude
+
 AllCops:
   TargetRubyVersion: 3.2
   NewCops: enable
