@@ -8,6 +8,12 @@ module PSN
     # change without notice; verify changes with bin/smoke.
     class Social
       PRESENCE_PATH = "/api/userProfile/v1/internal/users/%s/basicPresences"
+      FRIENDS_PATH = "/api/userProfile/v1/internal/users/%s/friends"
+      REQUESTS_PATH = "/api/userProfile/v1/internal/users/me/friends/receivedRequests"
+      BLOCKS_PATH = "/api/userProfile/v1/internal/users/me/blocks"
+      # No server-side cap has been verified live for these list endpoints;
+      # 100 is a conservative page size, not a known limit.
+      PAGE_SIZE = 100
 
       def initialize(connection, users)
         @connection = connection
@@ -20,6 +26,33 @@ module PSN
         path = format(PRESENCE_PATH, @users.account_id(online_id))
         response = @connection.get(:mobile, path, { "type" => "primary" })
         Presence.from_api(response["basicPresence"] || {})
+      end
+
+      # Account IDs on the user's friends list, as bare strings — the payload
+      # carries no profile data; hydrate via profiles/search as needed. 403 on
+      # a privacy-restricted account surfaces as PSN::PrivacyError.
+      def friends(online_id = nil)
+        id_pages(format(FRIENDS_PATH, @users.account_id(online_id)), "friends")
+      end
+
+      # Account IDs with pending friend requests to the authenticated account.
+      def friend_requests
+        id_pages(REQUESTS_PATH, "receivedRequests")
+      end
+
+      # Account IDs the authenticated account has blocked. The response
+      # carries no totalItemCount, so paging stops on the first empty page.
+      def blocked
+        id_pages(BLOCKS_PATH, "blockList")
+      end
+
+      private
+
+      def id_pages(path, key)
+        Paginator.offset(page_size: PAGE_SIZE) do |limit, offset|
+          response = @connection.get(:mobile, path, { "limit" => limit, "offset" => offset })
+          [response[key] || [], response["totalItemCount"]]
+        end
       end
     end
   end
