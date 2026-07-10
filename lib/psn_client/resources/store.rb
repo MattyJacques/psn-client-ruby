@@ -7,8 +7,6 @@ module PSN
     # of their hosts, paths and response keys is confined to this file so a
     # change only lands here (and in the store models). Verify with bin/smoke.
     class Store
-      TRANSACTIONS_HOST = :web
-      TRANSACTIONS_PATH = "/api/transact/v1/purchases/transactions"
       ENTITLEMENTS_HOST = :web
       ENTITLEMENTS_PATH = "/api/entitlements/v2/users/me/internal_entitlements"
       PAGE_SIZE = 50
@@ -18,19 +16,21 @@ module PSN
       WISHLIST_OPERATION = "metGetStoreWishlist"
       WISHLIST_HASH = "571149e8aa4d76af7dd33b92e1d6f8f828ebc5fa8f0f6bf51a8324a0e6d71324"
 
+      # Sony decommissioned the REST transaction-history endpoint at the CDN
+      # edge (Akamai 403 HTML before auth; verified live 2026-07-08). The web
+      # store now uses a GraphQL persisted query whose whitelisted hash is not
+      # publicly known. Old endpoint, kept for the record:
+      #   GET :web /api/transact/v1/purchases/transactions  (cursor paging)
+      TRANSACTIONS_ERROR = "Sony decommissioned the transactions endpoint at its CDN edge; " \
+                           "no working replacement is known (see resources/store.rb)"
+
       def initialize(connection)
         @connection = connection
       end
 
-      # Monetary transaction history: orders, refunds, wallet funding.
+      # Monetary transaction history. Decommissioned by Sony — always raises.
       def transactions
-        paginator = Paginator.cursor do |cursor|
-          params = { "limit" => PAGE_SIZE }
-          params["cursor"] = cursor if cursor
-          response = @connection.get(TRANSACTIONS_HOST, TRANSACTIONS_PATH, params)
-          [response["transactions"] || [], response["nextCursor"]]
-        end
-        paginator.map { |t| Transaction.from_api(t) }
+        raise APIError, TRANSACTIONS_ERROR
       end
 
       # Everything the account owns: games, DLC, free claims.

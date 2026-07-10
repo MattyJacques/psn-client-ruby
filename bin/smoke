@@ -36,10 +36,6 @@ section("5 trophy titles") do
   client.trophies.titles.first(5).each { |t| puts "#{t.name} (#{t.progress}%)" }
 end
 
-section("5 transactions") do
-  client.store.transactions.first(5).each { |t| puts "#{t.date} #{t.description} #{t.amount} #{t.currency}" }
-end
-
 section("5 entitlements") do
   client.store.entitlements.first(5).each { |e| puts "#{e.name} [#{e.platform}] #{e.acquired_at}" }
 end

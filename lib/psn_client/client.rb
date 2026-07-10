@@ -7,7 +7,7 @@ module PSN
   #   client = PSN::Client.new(npsso: "...")
   #   client.games.played.first(10)
   #   client.trophies.summary("a_friend")
-  #   client.store.transactions.to_a
+  #   client.store.entitlements.to_a
   class Client
     def initialize(npsso: nil, refresh_token: nil)
       @auth = Auth.new(npsso: npsso, refresh_token: refresh_token)

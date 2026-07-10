@@ -6,26 +6,10 @@ RSpec.describe PSN::Resources::Store do
   let(:connection) { instance_double(PSN::Connection) }
 
   describe "#transactions" do
-    it "walks cursor pages and maps Transaction objects" do
+    it "raises APIError without making any HTTP call" do
       allow(connection).to receive(:get)
-        .with(:web, "/api/transact/v1/purchases/transactions", { "limit" => 50 })
-        .and_return({ "transactions" => [fixture("transaction")], "nextCursor" => "c1" })
-      allow(connection).to receive(:get)
-        .with(:web, "/api/transact/v1/purchases/transactions", { "limit" => 50, "cursor" => "c1" })
-        .and_return({ "transactions" => [fixture("transaction").merge("transactionId" => "2")],
-                      "nextCursor" => nil })
-
-      result = store.transactions.to_a
-      expect(result.size).to eq(2)
-      expect(result.first).to be_a(PSN::Transaction)
-      expect(result.last.transaction_id).to eq("2")
-    end
-
-    it "is lazy" do
-      allow(connection).to receive(:get)
-        .and_return({ "transactions" => [fixture("transaction")], "nextCursor" => "more" })
-      expect(store.transactions.first(1).size).to eq(1)
-      expect(connection).to have_received(:get).once
+      expect { store.transactions }.to raise_error(PSN::APIError, /decommissioned/)
+      expect(connection).not_to have_received(:get)
     end
   end
 
