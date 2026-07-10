@@ -7,7 +7,7 @@ module PSN
   #   client = PSN::Client.new(npsso: "...")
   #   client.games.played.first(10)
   #   client.trophies.summary("a_friend")
-  #   client.store.transactions.to_a
+  #   client.store.entitlements.to_a
   class Client
     def initialize(npsso: nil, refresh_token: nil)
       @auth = Auth.new(npsso: npsso, refresh_token: refresh_token)
@@ -22,6 +22,8 @@ module PSN
     def catalog = @catalog ||= Resources::Catalog.new(@connection)
     def social = @social ||= Resources::Social.new(@connection, users)
     def devices = @devices ||= Resources::Devices.new(@connection)
+    def media = @media ||= Resources::Media.new(@connection)
+    def groups = @groups ||= Resources::Groups.new(@connection)
 
     # Triggers authentication if it has not happened yet.
     def access_token = @auth.access_token

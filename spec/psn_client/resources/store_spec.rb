@@ -6,40 +6,39 @@ RSpec.describe PSN::Resources::Store do
   let(:connection) { instance_double(PSN::Connection) }
 
   describe "#transactions" do
-    it "walks cursor pages and maps Transaction objects" do
+    it "raises APIError without making any HTTP call" do
       allow(connection).to receive(:get)
-        .with(:web, "/api/transact/v1/purchases/transactions", { "limit" => 50 })
-        .and_return({ "transactions" => [fixture("transaction")], "nextCursor" => "c1" })
-      allow(connection).to receive(:get)
-        .with(:web, "/api/transact/v1/purchases/transactions", { "limit" => 50, "cursor" => "c1" })
-        .and_return({ "transactions" => [fixture("transaction").merge("transactionId" => "2")],
-                      "nextCursor" => nil })
-
-      result = store.transactions.to_a
-      expect(result.size).to eq(2)
-      expect(result.first).to be_a(PSN::Transaction)
-      expect(result.last.transaction_id).to eq("2")
-    end
-
-    it "is lazy" do
-      allow(connection).to receive(:get)
-        .and_return({ "transactions" => [fixture("transaction")], "nextCursor" => "more" })
-      expect(store.transactions.first(1).size).to eq(1)
-      expect(connection).to have_received(:get).once
+      expect { store.transactions }.to raise_error(PSN::APIError, /decommissioned/)
+      expect(connection).not_to have_received(:get)
     end
   end
 
   describe "#entitlements" do
-    it "walks offset pages and maps Entitlement objects" do
+    let(:params) do
+      { "entitlementType" => "1,2,3,4,5",
+        "fields" => "titleMeta,gameMeta,conceptMeta,rewardMeta," \
+                    "rewardMeta.retentionPolicy,rewardMeta.rewardMembershipType",
+        "gameMetaPackageType" => "PSGD,PS4GD", "limit" => 50, "offset" => 0 }
+    end
+
+    it "walks offset pages on the mobile host and maps Entitlement objects" do
       allow(connection).to receive(:get)
-        .with(:web, "/api/entitlements/v2/users/me/internal_entitlements",
-              { "limit" => 50, "offset" => 0 })
-        .and_return({ "entitlements" => [fixture("entitlement")], "total_results" => 1 })
+        .with(:mobile, "/api/entitlement/v2/users/me/internal/entitlements", params)
+        .and_return({ "entitlements" => [fixture("entitlement")], "totalResults" => 1 })
 
       result = store.entitlements.to_a
       expect(result.size).to eq(1)
       expect(result.first).to be_a(PSN::Entitlement)
-      expect(result.first.name).to eq("ASTRO's PLAYROOM")
+      expect(result.first.name).to eq("EXAMPLE GAME PS4")
+    end
+
+    it "joins title_ids into the titleId filter param" do
+      allow(connection).to receive(:get)
+        .with(:mobile, "/api/entitlement/v2/users/me/internal/entitlements",
+              params.merge("titleId" => "PPSA01325_00,CUSA13323_00"))
+        .and_return({ "entitlements" => [], "totalResults" => 0 })
+
+      expect(store.entitlements(title_ids: %w[PPSA01325_00 CUSA13323_00]).to_a).to eq([])
     end
   end
 

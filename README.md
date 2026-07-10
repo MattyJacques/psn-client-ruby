@@ -1,7 +1,7 @@
 # psn-client-ruby
 
 Unofficial Ruby client for the PlayStation Network API: games played,
-trophies earned, transaction history and entitlements.
+trophies earned, and entitlements.
 
 ## Installation
 
@@ -65,6 +65,15 @@ client.devices.storage(platform: "PS5")   # => [PSN::ConsoleStorage]
 client.profiles.shareable_link            # => PSN::ShareableLink (URL + QR code)
 client.profiles.find.region               # => "GB" — decoded from the profile npId
 
+# Media gallery (authenticated account only)
+client.media.captures.first(10)        # PROVISIONAL: raw capture hashes (lazy)
+client.media.download_url(ugc_id)      # PROVISIONAL: raw tokenized-URL hash
+
+# Message groups (read-only, authenticated account only)
+client.groups.all.first(10)                 # => PSN::Group DMs and group chats (lazy)
+client.groups.find(group_id)                # => PSN::Group with members + latest message
+client.groups.messages(group_id).first(20)  # => PSN::GroupMessage, newest first (lazy)
+
 # Trophies
 client.trophies.summary                                  # level, counts
 client.trophies.titles.to_a                              # per-game progress
@@ -74,8 +83,8 @@ client.trophies.title_summary(title_ids: %w[PPSA01325_00 CUSA13323_00])
 client.trophies.groups(np_communication_id: "NPWR20188_00")  # base game vs DLC
 
 # Purchases and wishlist (authenticated account only)
-client.store.transactions.first(20)  # orders, refunds, wallet funding
-client.store.entitlements.to_a       # everything owned incl. free claims
+# client.store.transactions raises PSN::APIError — Sony decommissioned the endpoint
+client.store.entitlements.to_a       # everything owned incl. free claims (PS4/PS5)
 client.store.wishlist.to_a           # store wishlist incl. unreleased concepts
 
 # Search the store and players
@@ -108,9 +117,8 @@ help.access?  # false without a PS+ subscription
 
 `games.purchased` and `store.entitlements` overlap but answer different
 questions: `purchased` is the games-only library view (artwork,
-`downloadable?`, `pre_order?`), `entitlements` is the complete ownership
-ledger down to DLC and free claims, and `transactions` is the only source
-of monetary data.
+`downloadable?`, `pre_order?`), and `entitlements` is the complete ownership
+ledger down to DLC and free claims.
 
 Amounts are integer minor units (`6999` + `"GBP"` = £69.99).
 

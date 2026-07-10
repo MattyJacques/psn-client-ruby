@@ -4,10 +4,13 @@ module PSN
   module Resources
     # Social graph and presence: friends, received friend requests, blocked
     # accounts and basic presence. Internal mobile-app endpoints under
-    # /api/userProfile/v1/internal/users — undocumented Sony APIs that can
+    # /api/userProfile/{v1,v2}/internal/users — undocumented Sony APIs that can
     # change without notice; verify changes with bin/smoke.
     class Social
-      PRESENCE_PATH = "/api/userProfile/v1/internal/users/%s/basicPresences"
+      # v2 since 2026-07-10: probed live against v1 and the payloads were
+      # byte-identical (offline/minimal-field case; online-state fields were
+      # not compared). v2 is the version the PlayStation App uses.
+      PRESENCE_PATH = "/api/userProfile/v2/internal/users/%s/basicPresences"
       FRIENDS_PATH = "/api/userProfile/v1/internal/users/%s/friends"
       REQUESTS_PATH = "/api/userProfile/v1/internal/users/me/friends/receivedRequests"
       BLOCKS_PATH = "/api/userProfile/v1/internal/users/me/blocks"

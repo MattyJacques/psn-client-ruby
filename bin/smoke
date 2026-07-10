@@ -36,10 +36,6 @@ section("5 trophy titles") do
   client.trophies.titles.first(5).each { |t| puts "#{t.name} (#{t.progress}%)" }
 end
 
-section("5 transactions") do
-  client.store.transactions.first(5).each { |t| puts "#{t.date} #{t.description} #{t.amount} #{t.currency}" }
-end
-
 section("5 entitlements") do
   client.store.entitlements.first(5).each { |e| puts "#{e.name} [#{e.platform}] #{e.acquired_at}" }
 end
@@ -194,6 +190,27 @@ section("Console storage") do
     console.installed_titles.first(3).each do |title|
       puts "  #{title.name} #{(title.size_bytes / 1e9).round(1)}GB last=#{title.last_played_at}"
     end
+  end
+end
+
+section("Media captures (PROVISIONAL, raw)") do
+  captures = client.media.captures.first(3).to_a
+  puts captures.inspect[0, 500]
+  first = captures.first
+  puts "url: #{client.media.download_url(first['ugcId']).inspect[0, 300]}" if first
+end
+
+section("3 groups + last messages") do
+  groups = client.groups.all.first(3)
+  groups.each do |g|
+    last = g.latest_message
+    puts "#{g.name || '(unnamed)'} members=#{g.members.size} " \
+         "last=#{last&.sender_online_id}: #{last&.body&.slice(0, 40)}"
+  end
+  if (group = groups.first)
+    detail = client.groups.find(group.id)
+    puts "detail: roles=#{detail.members.map(&:role).tally} modified=#{detail.modified_at}"
+    client.groups.messages(group.id).first(3).each { |m| puts "  #{m.created_at} #{m.sender_online_id}: #{m.body}" }
   end
 end
 

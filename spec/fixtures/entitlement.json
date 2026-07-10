@@ -1,10 +1,45 @@
 {
-  "id": "UP9000-PPSA01325_00-GAME000000000000",
-  "active_date": "2024-12-25T09:58:00Z",
-  "entitlement_type": 5,
-  "game_meta": {
-    "name": "ASTRO's PLAYROOM",
-    "type": "PS5GD",
-    "icon_url": "https://image.api.playstation.com/e.png"
-  }
+  "id": "EP0000-CUSA00000_00-EXAMPLEGAME00000",
+  "activeDate": "2024-05-02T16:02:09Z",
+  "entitlementType": 5,
+  "skuId": "EP0000-CUSA00000_00-0000000000000000-E001",
+  "productId": "EP0000-CUSA00000_00-0000000000000000",
+  "activeFlag": true,
+  "revisionId": 1781646950250,
+  "featureType": 3,
+  "preorderFlag": false,
+  "remainingCount": 0,
+  "consumedCount": 0,
+  "isConsumable": false,
+  "isSubscription": false,
+  "entitlementAttributes": [
+    {
+      "entitlementKeyFlag": true,
+      "platformId": "ps4",
+      "placeholderFlag": false
+    }
+  ],
+  "gameMeta": {
+    "name": "Example Game PS4",
+    "type": "PS4GD",
+    "iconUrl": "https://image.api.playstation.com/example/icon0.png",
+    "packageType": "PS4GD"
+  },
+  "titleMeta": {
+    "titleId": "CUSA00000_00",
+    "name": "EXAMPLE GAME PS4",
+    "imageUrl": "https://image.api.playstation.com/example/image.png"
+  },
+  "conceptMeta": {
+    "conceptId": "100000",
+    "name": "Example Game PS4",
+    "iconUrl": "https://image.api.playstation.com/example/concept.png",
+    "minimumAge": 18
+  },
+  "rewardMeta": {
+    "rewardServiceType": 0,
+    "retentionPolicy": 0
+  },
+  "preorderPlaceholderFlag": false,
+  "serviceType": 0
 }

@@ -1,0 +1,44 @@
+{
+  "groupId": "9999999999999999999999999999999999999999-100",
+  "groupType": 1,
+  "groupName": {
+    "value": "Example Group",
+    "status": 1,
+    "modifier": {
+      "accountId": "1234567890123456789",
+      "onlineId": "example_user"
+    },
+    "modifiedTimestamp": "1751980000000"
+  },
+  "groupIcon": {
+    "status": 0
+  },
+  "mainThread": {
+    "threadId": "9999999999999999999999999999999999999999-100",
+    "modifiedTimestamp": "1751980000000",
+    "latestMessage": {
+      "messageUid": "9#100000000000001",
+      "messageType": 1,
+      "alternativeMessageType": 1,
+      "body": "Hello world",
+      "createdTimestamp": "1751980000000",
+      "sender": {
+        "accountId": "9876543210987654321",
+        "onlineId": "example_friend"
+      }
+    },
+    "readMessageUid": "7#100000000000000"
+  },
+  "members": [
+    {
+      "accountId": "1234567890123456789",
+      "onlineId": "example_user",
+      "role": "owner"
+    },
+    {
+      "accountId": "9876543210987654321",
+      "onlineId": "example_friend",
+      "role": "member"
+    }
+  ]
+}
