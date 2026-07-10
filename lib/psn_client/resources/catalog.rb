@@ -7,7 +7,9 @@ module PSN
     # the web store's GraphQL host (:web) and need no account context —
     # Sony serves them anonymously. Undocumented; operation names, hashes
     # and response root keys are confined to this file and were verified
-    # live 2026-07 (see bin/smoke).
+    # live 2026-07 (see bin/smoke). One exception: #concept_for_title is an
+    # authenticated REST call on the :mobile host, not an anonymous web-store
+    # query.
     class Catalog
       HOST = :web
       PRODUCT_OPERATION = "metGetProductById"
@@ -57,6 +59,7 @@ module PSN
         new_games: "e1699f77-77e1-43ca-a296-26d08abacb0f"
       }.freeze
       PAGE_SIZE = 50
+      TITLE_CONCEPT_PATH = "/api/catalog/v2/titles/%s/concepts"
 
       def initialize(connection)
         @connection = connection
@@ -136,6 +139,15 @@ module PSN
         response = graphql(CONCEPT_BY_PRODUCT_OPERATION, { "productId" => product_id },
                            CONCEPT_BY_PRODUCT_HASH)
         StoreConcept.from_api(response.dig("data", "productRetrieve", "concept") || {})
+      end
+
+      # PROVISIONAL: resolve an npTitleId ("CUSA01433_00") to its concept via
+      # the mobile app's catalog — the reverse direction of the trophy/game
+      # list surfaces. Returns the raw response body until the payload shape
+      # is confirmed via bin/smoke; if it matches StoreConcept the mapping
+      # will reuse it.
+      def concept_for_title(np_title_id)
+        @connection.get(:mobile, format(TITLE_CONCEPT_PATH, np_title_id), {})
       end
 
       # DLC and add-ons keyed by concept (see #add_ons for the title-ID

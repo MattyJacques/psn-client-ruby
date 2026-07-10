@@ -331,4 +331,15 @@ RSpec.describe PSN::Resources::Catalog do
       expect { catalog.plus_offers(:mega) }.to raise_error(KeyError)
     end
   end
+
+  describe "#concept_for_title" do
+    it "returns the raw mobile catalog body (provisional mapping)" do
+      body = { "concepts" => [{ "conceptId" => "10015869" }] }
+      allow(connection).to receive(:get)
+        .with(:mobile, "/api/catalog/v2/titles/CUSA01433_00/concepts", {})
+        .and_return(body)
+
+      expect(catalog.concept_for_title("CUSA01433_00")).to eq(body)
+    end
+  end
 end
