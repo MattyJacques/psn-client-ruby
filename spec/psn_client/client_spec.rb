@@ -20,11 +20,19 @@ RSpec.describe PSN::Client do
     expect(client.search).to equal(client.search)
   end
 
-  it "exposes the search and catalog resources" do
+  it "exposes the search, catalog and social resources" do
     client = described_class.new(refresh_token: "RT-0")
     expect(client.search).to be_a(PSN::Resources::Search)
     expect(client.catalog).to be_a(PSN::Resources::Catalog)
     expect(client.catalog).to equal(client.catalog)
+    expect(client.social).to be_a(PSN::Resources::Social)
+    expect(client.social).to equal(client.social)
+  end
+
+  it "exposes the devices resource" do
+    client = described_class.new(refresh_token: "RT-0")
+    expect(client.devices).to be_a(PSN::Resources::Devices)
+    expect(client.devices).to equal(client.devices)
   end
 
   it "requires exactly one credential" do

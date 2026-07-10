@@ -48,6 +48,22 @@ client.games.purchased.first(20)          # games-only storefront view
 client.profiles.find                      # authenticated account
 client.profiles.find("a_friend")          # avatar, PS Plus, presence, trophy level
 
+# Social graph and presence
+client.social.friends.first(10)           # account IDs (lazy), as bare strings
+client.social.presence("a_friend")        # => PSN::Presence: online?, platform, now_playing
+client.social.friend_requests.to_a        # incoming requests (account IDs)
+client.social.blocked.to_a                # blocked account IDs
+client.social.friendship("a_friend")      # PROVISIONAL: raw friendship summary
+client.social.available_to_play           # PROVISIONAL: raw availability list
+
+# Devices (authenticated account only)
+client.devices.all                        # => [PSN::Device] consoles/devices on the account
+client.devices.storage(platform: "PS5")   # PROVISIONAL: raw console storage usage
+
+# Profile extras
+client.profiles.shareable_link            # => PSN::ShareableLink (URL + QR code)
+client.profiles.find.region               # => "GB" — decoded from the profile npId
+
 # Trophies
 client.trophies.summary                                  # level, counts
 client.trophies.titles.to_a                              # per-game progress
@@ -81,6 +97,7 @@ client.catalog.editions(product.concept_id)                   # => [PSN::Edition
 client.catalog.concept_for_product(product.id)                # => PSN::StoreConcept
 client.catalog.add_ons_by_concept(product.concept_id).first(10)  # DLC keyed by concept
 client.catalog.plus_offers(:extra)                             # => [PSN::PlusOffer]
+client.catalog.concept_for_title("CUSA01433_00")  # PROVISIONAL: npTitleId -> concept (raw)
 
 # Trophy Game Help (PS+ hints)
 infos = client.trophies.game_help_availability(np_communication_id: "NPWR20188_00")

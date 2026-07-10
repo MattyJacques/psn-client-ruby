@@ -18,6 +18,15 @@ RSpec.describe PSN::Connection do
     expect(connection.get(:mobile, "/api/test", { "limit" => 10 })).to eq("ok" => true)
   end
 
+  it "passes extra headers through on GET" do
+    stub_request(:get, url)
+      .with(headers: { "Authorization" => "Bearer tok-1", "Accept-Language" => "en-us" })
+      .to_return(json_response({ "ok" => true }))
+
+    expect(connection.get(:mobile, "/api/test", {}, headers: { "Accept-Language" => "en-us" }))
+      .to eq("ok" => true)
+  end
+
   it "performs a JSON POST against the web host" do
     stub_request(:post, "https://web.np.playstation.com/api/test")
       .with(body: { "a" => 1 }.to_json, headers: { "Authorization" => "Bearer tok-1" })

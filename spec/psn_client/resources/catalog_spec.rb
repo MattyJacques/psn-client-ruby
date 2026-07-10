@@ -331,4 +331,16 @@ RSpec.describe PSN::Resources::Catalog do
       expect { catalog.plus_offers(:mega) }.to raise_error(KeyError)
     end
   end
+
+  describe "#concept_for_title" do
+    it "returns the raw mobile catalog body (provisional mapping)" do
+      # Real responses are a top-level array of concepts (verified live 2026-07-10).
+      body = [{ "id" => 10_015_869, "nameEn" => "ASTRO BOT", "titleIds" => %w[PPSA01325_00] }]
+      allow(connection).to receive(:get)
+        .with(:mobile, "/api/catalog/v2/titles/CUSA01433_00/concepts", {})
+        .and_return(body)
+
+      expect(catalog.concept_for_title("CUSA01433_00")).to eq(body)
+    end
+  end
 end

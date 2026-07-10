@@ -36,4 +36,25 @@ RSpec.describe PSN::Profile do
     expect(bare.online).to be(false)
     expect(bare.platform).to be_nil
   end
+
+  describe "#region" do
+    it "extracts the region from a plain-form npId" do
+      expect(profile.region).to eq("GB")
+    end
+
+    it "extracts the region from a fully base64-encoded npId" do
+      hash = fixture("profile").merge("npId" => ["MattyJ@b6.us"].pack("m0"))
+      expect(described_class.from_api(hash).region).to eq("US")
+    end
+
+    it "is nil when npId is missing" do
+      hash = fixture("profile").tap { |h| h.delete("npId") }
+      expect(described_class.from_api(hash).region).to be_nil
+    end
+
+    it "is nil when the npId does not decode to a two-letter region" do
+      hash = fixture("profile").merge("npId" => "garbage")
+      expect(described_class.from_api(hash).region).to be_nil
+    end
+  end
 end

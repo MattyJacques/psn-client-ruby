@@ -1,0 +1,17 @@
+{
+  "availability": "availableToPlay",
+  "primaryPlatformInfo": {
+    "onlineStatus": "online",
+    "platform": "PS5",
+    "lastOnlineDate": "2026-07-09T21:14:02.000Z"
+  },
+  "gameTitleInfoList": [
+    {
+      "npTitleId": "PPSA01325_00",
+      "titleName": "ASTRO's PLAYROOM",
+      "format": "PS5",
+      "launchPlatform": "PS5",
+      "conceptIconUrl": "https://image.api.playstation.com/vulcan/img/rnd/202010/astro-icon.png"
+    }
+  ]
+}

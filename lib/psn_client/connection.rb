@@ -32,8 +32,8 @@ module PSN
       @conns = {}
     end
 
-    def get(host, path, params = {})
-      request(host, :get, path, params)
+    def get(host, path, params = {}, headers: {})
+      request(host, :get, path, params, headers: headers)
     end
 
     def post(host, path, body)

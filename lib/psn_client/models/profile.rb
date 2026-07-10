@@ -36,5 +36,20 @@ module PSN
     def plus? = plus
     def verified? = verified
     def online? = online
+
+    # ISO 3166-1 alpha-2 country code decoded from npId ("name@b6.gb" ->
+    # "GB"); nil when npId is missing or malformed. Sony returns npId either
+    # partially encoded (live profile2 responses) or fully base64-encoded
+    # (the form psn-api decodes) — handle both.
+    def region
+      np_id = raw["npId"]
+      return nil unless np_id
+
+      decoded = np_id.include?("@") ? np_id : np_id.unpack1("m").force_encoding(Encoding::UTF_8)
+      return nil unless decoded.valid_encoding?
+
+      candidate = decoded.split(".").last
+      candidate&.match?(/\A[A-Za-z]{2}\z/) ? candidate.upcase : nil
+    end
   end
 end
