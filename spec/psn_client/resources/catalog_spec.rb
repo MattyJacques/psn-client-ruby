@@ -163,4 +163,77 @@ RSpec.describe PSN::Resources::Catalog do
       expect(connection).to have_received(:graphql).once
     end
   end
+
+  describe "#content_rating" do
+    it "returns the concept-level ContentRating" do
+      allow(connection).to receive(:graphql)
+        .with("conceptRetrieveForContentRating", { "conceptId" => "10015869" },
+              described_class::CONTENT_RATING_HASH, host: :web)
+        .and_return({ "data" => { "conceptRetrieve" => { "contentRating" => fixture("content_rating") } } })
+
+      rating = catalog.content_rating(10_015_869)
+      expect(rating).to be_a(PSN::ContentRating)
+      expect(rating.description).to eq("PEGI 18")
+    end
+
+    it "returns nil when the concept has no rating" do
+      allow(connection).to receive(:graphql).and_return({ "data" => { "conceptRetrieve" => {} } })
+      expect(catalog.content_rating("10015869")).to be_nil
+    end
+  end
+
+  describe "#media" do
+    it "maps the default product's media entries" do
+      media = [{ "role" => "SCREENSHOT", "type" => "IMAGE", "url" => "https://x/1.jpg" },
+               { "role" => "PREVIEW", "type" => "VIDEO", "url" => "https://x/1.mp4" }]
+      allow(connection).to receive(:graphql)
+        .with("conceptRetrieveForMedia", { "conceptId" => "10015869" },
+              described_class::MEDIA_HASH, host: :web)
+        .and_return({ "data" => { "conceptRetrieve" => { "defaultProduct" => { "media" => media } } } })
+
+      result = catalog.media("10015869")
+      expect(result.map(&:role)).to eq(%w[SCREENSHOT PREVIEW])
+      expect(result.first).to be_a(PSN::MediaItem)
+    end
+
+    it "returns an empty array for a concept without a default product" do
+      allow(connection).to receive(:graphql).and_return({ "data" => { "conceptRetrieve" => nil } })
+      expect(catalog.media("10015869")).to eq([])
+    end
+  end
+
+  describe "#compatibility_notices" do
+    it "returns flattened CompatibilityNotices" do
+      allow(connection).to receive(:graphql)
+        .with("conceptRetrieveForCompatibilityNotices", { "conceptId" => "10015869" },
+              described_class::COMPATIBILITY_HASH, host: :web)
+        .and_return({ "data" => { "conceptRetrieve" => fixture("compatibility_concept") } })
+
+      notices = catalog.compatibility_notices("10015869")
+      expect(notices.compatibility).to eq([{ platform: "Common", type: "NO_OF_PLAYERS", value: "1" }])
+    end
+
+    it "returns an empty model for an unknown concept" do
+      allow(connection).to receive(:graphql).and_return({ "data" => { "conceptRetrieve" => nil } })
+      expect(catalog.compatibility_notices("10015869").compatibility).to eq([])
+    end
+  end
+
+  describe "#legal_text" do
+    it "returns the default product's LegalText" do
+      allow(connection).to receive(:graphql)
+        .with("wcaConceptRetrieveForLegalText", { "conceptId" => "10015869" },
+              described_class::LEGAL_HASH, host: :web)
+        .and_return({ "data" => { "conceptRetrieve" => { "defaultProduct" => fixture("legal_product") } } })
+
+      legal = catalog.legal_text("10015869")
+      expect(legal.publisher).to eq("Microsoft Corporation")
+      expect(legal.notices.first[:sub_type]).to eq("SCEE_TOS")
+    end
+
+    it "returns an empty model for an unknown concept" do
+      allow(connection).to receive(:graphql).and_return({ "data" => { "conceptRetrieve" => nil } })
+      expect(catalog.legal_text("10015869").notices).to eq([])
+    end
+  end
 end
