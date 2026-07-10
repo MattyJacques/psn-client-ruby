@@ -153,5 +153,52 @@ section("Game Help for ASTRO's PLAYROOM (NPWR20188_00)") do
   puts "access=#{help.access?} tips=#{help.tips.flat_map(&:contents).map(&:display_name).join(', ')}"
 end
 
+section("Presence") do
+  p = client.social.presence
+  puts "availability=#{p.availability} online=#{p.online?} platform=#{p.platform || '-'}"
+  p.now_playing.each { |t| puts "playing: #{t.name} [#{t.format}]" }
+end
+
+section("5 friends / requests / blocked") do
+  puts "friends: #{client.social.friends.first(5).to_a.join(', ')}"
+  puts "requests: #{client.social.friend_requests.first(5).to_a.inspect}"
+  puts "blocked: #{client.social.blocked.first(5).to_a.inspect}"
+end
+
+section("Friendship summary (PROVISIONAL, raw body; set PSN_FRIEND_ID)") do
+  friend = ENV.fetch("PSN_FRIEND_ID", nil)
+  if friend
+    puts client.social.friendship(friend).inspect[0, 500]
+  else
+    puts "skipped (set PSN_FRIEND_ID to a friend's online ID)"
+  end
+end
+
+section("Available to play (PROVISIONAL, raw body)") do
+  puts client.social.available_to_play.inspect[0, 500]
+end
+
+section("Devices") do
+  client.devices.all.each { |d| puts "#{d.device_type} #{d.activation_type} activated=#{d.activated_at}" }
+end
+
+section("Console storage (PROVISIONAL, raw body)") do
+  puts client.devices.storage.inspect[0, 500]
+end
+
+section("Shareable profile link") do
+  link = client.profiles.shareable_link
+  puts "#{link.url} qr=#{link.image_url}"
+end
+
+section("Profile region") do
+  puts client.profiles.find.region.inspect
+end
+
+section("Catalog: concept for most recent played title (PROVISIONAL, raw body)") do
+  id = client.games.played.first(1).first.title_id
+  puts client.catalog.concept_for_title(id).inspect[0, 500]
+end
+
 puts "\nRefresh token (persist for next session):"
 puts client.refresh_token
