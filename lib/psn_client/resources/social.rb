@@ -4,7 +4,7 @@ module PSN
   module Resources
     # Social graph and presence: friends, received friend requests, blocked
     # accounts and basic presence. Internal mobile-app endpoints under
-    # /api/userProfile/v1/internal/users — undocumented Sony APIs that can
+    # /api/userProfile/{v1,v2}/internal/users — undocumented Sony APIs that can
     # change without notice; verify changes with bin/smoke.
     class Social
       # v2 since 2026-07-10: probed live against v1 and the payloads were

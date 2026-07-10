@@ -194,17 +194,22 @@ section("Console storage") do
 end
 
 section("Media captures (PROVISIONAL, raw)") do
-  puts client.media.captures.first(3).to_a.inspect[0, 500]
+  captures = client.media.captures.first(3).to_a
+  puts captures.inspect[0, 500]
+  first = captures.first
+  puts "url: #{client.media.download_url(first['ugcId']).inspect[0, 300]}" if first
 end
 
 section("3 groups + last messages") do
-  client.groups.all.first(3).each do |g|
+  groups = client.groups.all.first(3)
+  groups.each do |g|
     last = g.latest_message
     puts "#{g.name || '(unnamed)'} members=#{g.members.size} " \
          "last=#{last&.sender_online_id}: #{last&.body&.slice(0, 40)}"
   end
-  group = client.groups.all.first(1).first
-  if group
+  if (group = groups.first)
+    detail = client.groups.find(group.id)
+    puts "detail: roles=#{detail.members.map(&:role).tally} modified=#{detail.modified_at}"
     client.groups.messages(group.id).first(3).each { |m| puts "  #{m.created_at} #{m.sender_online_id}: #{m.body}" }
   end
 end
