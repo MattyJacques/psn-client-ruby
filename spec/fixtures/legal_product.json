@@ -1,0 +1,26 @@
+{
+  "__typename": "Product",
+  "id": "UP6312-PPSA31381_00-0202050640964065",
+  "publisherName": "Microsoft Corporation",
+  "privacyPolicy": null,
+  "descriptions": [
+    {
+      "__typename": "Description",
+      "subType": "NONE",
+      "type": "SHORT",
+      "value": "Fairytale Ending Not Guaranteed"
+    },
+    {
+      "__typename": "Description",
+      "subType": "SCEE_TOS",
+      "type": "LEGAL",
+      "value": "<br><br>Download of this product is subject to the PlayStation Network Terms of Service."
+    },
+    {
+      "__typename": "Description",
+      "subType": "SCEE_HEALTH_TEXT",
+      "type": "LEGAL",
+      "value": "<br>See health warnings for important health information."
+    }
+  ]
+}

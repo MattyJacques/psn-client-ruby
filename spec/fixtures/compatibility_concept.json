@@ -1,0 +1,36 @@
+{
+  "__typename": "Concept",
+  "id": "10015869",
+  "platforms": ["PS5"],
+  "accessibilityNoticesByPlatform": null,
+  "compatibilityNoticesByPlatform": {
+    "__typename": "CompatibilityNotices",
+    "Common": [
+      { "__typename": "CompatibilityNotice", "type": "NO_OF_PLAYERS", "value": "1" }
+    ],
+    "PS4": null,
+    "PS5": null
+  },
+  "defaultProduct": {
+    "__typename": "Product",
+    "id": "UP6312-PPSA31381_00-0202050640964065",
+    "platforms": ["PS5"],
+    "accessibilityNoticesByPlatform": {
+      "__typename": "AccessibilityNotices",
+      "Common": [
+        { "__typename": "AccessibilityNotice", "type": "SUBTITLES", "value": "Available" }
+      ],
+      "PS4": null,
+      "PS5": null,
+      "PSPC": null
+    },
+    "compatibilityNoticesByPlatform": {
+      "__typename": "CompatibilityNotices",
+      "Common": [
+        { "__typename": "CompatibilityNotice", "type": "NO_OF_PLAYERS", "value": "1" }
+      ],
+      "PS4": null,
+      "PS5": null
+    }
+  }
+}

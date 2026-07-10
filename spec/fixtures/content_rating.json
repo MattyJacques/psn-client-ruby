@@ -1,0 +1,22 @@
+{
+  "__typename": "ProductContentRating",
+  "authority": "PEGI",
+  "description": "PEGI 18",
+  "descriptors": [
+    {
+      "__typename": "ProductContentRatingDescriptor",
+      "description": "Language",
+      "name": "PEGI_LANGUAGE",
+      "url": "https://cdn-a.sonyentertainmentnetwork.com/images/descriptors/hd/pegi/language.png"
+    },
+    {
+      "__typename": "ProductContentRatingDescriptor",
+      "description": "Violence",
+      "name": "PEGI_VIOLENCE",
+      "url": "https://cdn-a.sonyentertainmentnetwork.com/images/descriptors/hd/pegi/violence.png"
+    }
+  ],
+  "interactiveElements": [],
+  "name": "PEGI_18",
+  "url": "https://cdn-a.sonyentertainmentnetwork.com/grc/images/ratings/hd/pegi/18.png"
+}

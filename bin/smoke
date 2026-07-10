@@ -106,6 +106,46 @@ section("Catalog: add-ons for most recent played game") do
   client.catalog.add_ons(id).first(3).each { |a| puts "#{a.name} #{a.price&.discounted_price || '-'}" }
 end
 
+section("Catalog: concept detail slices (rating, media, legal, compat)") do
+  hit = client.search.games("astro bot").first(1).first
+  concept_id = client.catalog.product(hit.id).concept_id
+  rating = client.catalog.content_rating(concept_id)
+  puts "rating: #{rating&.description} (#{rating&.authority})"
+  media = client.catalog.media(concept_id)
+  puts "media: #{media.size} assets, first: #{media.first&.role} #{media.first&.type}"
+  legal = client.catalog.legal_text(concept_id)
+  puts "legal: #{legal.notices.size} notices, privacy=#{legal.privacy_policy || '-'}"
+  compat = client.catalog.compatibility_notices(concept_id)
+  puts "compat: #{compat.compatibility.size} entries, accessibility: #{compat.accessibility.size}"
+end
+
+section("Catalog: editions and concept_for_product") do
+  hit = client.search.games("astro bot").first(1).first
+  concept = client.catalog.concept_for_product(hit.id)
+  puts "concept: #{concept.id} #{concept.name}"
+  client.catalog.editions(concept.id).each do |e|
+    puts "#{e.name} #{e.cta_type} #{e.price&.discounted_price || '-'}"
+  end
+end
+
+section("Catalog: 3 add-ons by concept (AC Odyssey)") do
+  hit = client.search.games("assassin's creed odyssey").first(1).first
+  concept = client.catalog.concept_for_product(hit.id)
+  client.catalog.add_ons_by_concept(concept.id).first(3).each do |a|
+    puts "#{a.name} #{a.price&.discounted_price || '-'}"
+  end
+end
+
+section("Catalog: PS Plus offers (essential tier)") do
+  client.catalog.plus_offers.each { |o| puts "#{o.title} #{o.discounted_price} trial=#{o.trial?}" }
+end
+
+section("Friends who play (PROVISIONAL, raw body)") do
+  hit = client.search.games("astro bot").first(1).first
+  concept = client.catalog.concept_for_product(hit.id)
+  puts client.games.friends_who_play(concept.id).inspect[0, 500]
+end
+
 section("Game Help for ASTRO's PLAYROOM (NPWR20188_00)") do
   infos = client.trophies.game_help_availability(np_communication_id: "NPWR20188_00").first(3)
   infos.each { |t| puts "trophy #{t.trophy_id} #{t.help_type} #{t.uds_object_id}" }

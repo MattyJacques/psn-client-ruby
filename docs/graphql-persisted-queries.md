@@ -46,6 +46,15 @@ anonymous call hits an account-scoped operation.
 | `wcaConceptStarRatingRetrive` (`e12dc5ce…`) | web | `resources/catalog.rb` |
 | `metGetAddOnsByTitleId` (`e98d01ff…`) | web | `resources/catalog.rb` |
 | `categoryGridRetrieve` (`4ce7d410…`) | web | `resources/catalog.rb` |
+| `conceptRetrieveForContentRating` (`b504e0bc…`) | web | `resources/catalog.rb` |
+| `conceptRetrieveForMedia` (`615a2c46…`) | web | `resources/catalog.rb` |
+| `conceptRetrieveForCompatibilityNotices` (`fb1a981a…`) | web | `resources/catalog.rb` |
+| `wcaConceptRetrieveForLegalText` (`b4c35dd0…`) | web | `resources/catalog.rb` |
+| `conceptRetrieveForCtasWithPrice` (`eab9d873…`) | web | `resources/catalog.rb` |
+| `metGetConceptByProductIdQuery` (`0a4c9f36…`) | web | `resources/catalog.rb` |
+| `getAddOnProductsByConcept` (`23c26f56…`) | web | `resources/catalog.rb` |
+| `featuresRetrieve` (`010870e8…`) | web | `resources/catalog.rb` |
+| `friendsWhoPlayRetrieveByConceptId` (`7bf9a61a…`, provisional) | web | `resources/games.rb` |
 
 ## Verified candidates (anonymous, `:web` host)
 
@@ -64,35 +73,13 @@ full `metGetConceptById` payload is more than a caller needs.
 | `conceptRetrieveForGameInfo` | `156bf37e6d6091b4d584ebf5f430a65e818b6120525dd82a0745352d21619da6` | descriptions, localizedGenres, publisherName, releaseDate |
 | `conceptRetrieveForGameTitle` | `d244286e38044363f1fb6707f719d41558c74542fc421503a38124ca87068812` | name, ownedTitles, publisherName, releaseDate, descriptions |
 | `conceptRetrieveForGameTitle` (alt) | `e9faf8c60bf31d71c5e72ff36f9f5ebc713e62d93e975e538e72c1875de8c27b` | same minus descriptions — two registered variants of one operation; both live |
-| `conceptRetrieveForContentRating` | `b504e0bc68af3dc08bc56c0001b27da26ed15d70827420f80805b2d031a95aa8` | contentRating (ESRB/PEGI + descriptors) |
-| `conceptRetrieveForCompatibilityNotices` | `fb1a981a21d7a00ba72bd79d3998044d77207687a5aa1d3a17d90d7b7f3acb05` | compatibilityNoticesByPlatform, accessibilityNoticesByPlatform, platforms |
 | `conceptRetrieveForAccessibilityFeatures` | `5ad27cf7d1f053068dabf46cc131518a7b7d686e9d64daa1a500d8faab0444c2` | accessibilityNoticesByPlatform, platforms |
-| `conceptRetrieveForMedia` | `615a2c4618229aa2f11c10fe497eaf4fdc151e4dcc0b6b82e154aeacb0123c2d` | media (screenshots/videos), personalizedMeta |
 | `conceptRetrieveForMediaCarousel` | `404d96e0672728c19708b6519bcdc1427c5270ce76d9cb009cca39b8e68ace7b` | media (carousel set) |
-| `wcaConceptRetrieveForLegalText` | `b4c35dd0b4ec1541041699ac77e0f607d510d9b2b1e4ad9d2e743e1727f5aeb8` | privacyPolicy, legal descriptions, publisherName |
-| `conceptRetrieveForCtasWithPrice` | `eab9d873f90d4ad98fd55f07b6a0a606e6b3925f2d03b70477234b79c1df30b5` | products with CTAs + price, isInWishlist, releaseDate |
 | `conceptRetrieveForUpsellWithCtas` | `278822e6c6b9f304e4c788867b3e8a448c67847ac932d09213d5085811be3a18` | products (upsell editions), media |
 | `queryRetrieveTelemetryDataPDPConcept` | `3fc354c90bf032e8ce86f7ebbe761e8a9315b23d564612ff4587f8a6bbc16d19` | minimal id/name/defaultProduct (telemetry helper; little value) |
 
 ### Other verified queries
 
-- **`metGetConceptByProductIdQuery`** —
-  `0a4c9f3693b3604df1c8341fdc3e481f42eeecf961a996baaa65e65a657a6433`,
-  `{"productId": "<id>"}` → `data.productRetrieve.concept` with
-  `selectableProducts.purchasableProducts` and mobile CTAs. A direct
-  product→concept resolver (today the gem would go through
-  `metGetProductById` and read `concept.id`).
-- **`getAddOnProductsByConcept`** —
-  `23c26f5664dfee6d0a88183f4a6ba624b5d7ad082cf1768fb1c0b7c17b8a477e`,
-  `{"conceptId": "<id>", "pageArgs": {"size": N, "offset": N}}` →
-  `data.addOnProductsRetrieve.addOnProducts`. Concept-keyed complement to the
-  implemented `metGetAddOnsByTitleId`.
-- **`featuresRetrieve`** —
-  `010870e8b9269c5bcf06b60190edbf5229310d8fae5b86515ad73f05bd11c4d1`,
-  `{"tierLabel": "TIER_10" | "TIER_20" | "TIER_30"}` (Essential / Extra /
-  Deluxe-Premium) → `data.tierSelectorOffersRetrieve.offers` — PS Plus
-  subscription offers and pricing per tier. Natural fit for a `Catalog`
-  method like `plus_offers(tier)`.
 - **Alternate star-rating hashes** (both live; different field sets from the
   ones the gem uses): `wcaProductStarRatingRetrive`
   `375261278d57455869b962bb5642868cea24e067793814d5b41767b3b082a2d8` (adds
@@ -109,12 +96,14 @@ full `metGetConceptById` payload is more than a caller needs.
 
 Tested anonymously and refused with "Access denied", or never tested because
 they are account-scoped. Hashes from the ioBroker adapter and psn-php maps.
+`friendsWhoPlayRetrieveByConceptId` and the `getUserGameList` web variant are
+no longer listed here — both are now recorded in the gem
+(`resources/games.rb`: `#friends_who_play` is a provisional method for the
+former, `LIBRARY_HASH_WEB` is a fallback constant for the latter).
 
 | Operation | sha256Hash | Notes |
 | --- | --- | --- |
-| `friendsWhoPlayRetrieveByConceptId` | `7bf9a61a9218dd810c16a7ca930eb7a2576b63b5639e887c62219a467434f9c2` | `{"conceptId"}`; friends who play a game — best candidate here (web host, hash confirmed registered) |
 | `backwardCompatibility` | `be14d5cbae5a065dc9ef5e33f7de93d1f6c01c6aa28e4b44b94bea37e4fd0c03` | hash registered on web host; variables unknown |
-| `getUserGameList` (web variant) | `e780a6d8b921ef0c59ec01ea5c5255671272ca0d819edb61320914cf7a78b3ae` | library.playstation.com's flavor of the query the gem already uses on `:mobile`; psn-api documents the full query text — usable fallback if the app hash dies |
 | `metGetWebCheckoutCart` | `2d4165c4de76877a32f3d08c91ce2af0e01d69300131fed0a8022868235e85b1` | app checkout cart |
 | `metGetExperience` | `054e61ee68bbeadc21435caebcc4f2bba0919a99b06629d141b0b82dc55f10c4` | app store "experience" hub |
 | `metGetViews` | `6fd98ff7fecb603006fb5d92db176d5028435be163c8d1ee9f7c598ab4677dd1` | app store browse: views → |

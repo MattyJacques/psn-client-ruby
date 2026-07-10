@@ -73,6 +73,14 @@ client.catalog.pricing(product.concept_id)                    # => PSN::Price or
 client.catalog.product_rating(product.id)                     # => PSN::StarRating or nil
 client.catalog.category(:ps5_games).first(10)                 # browse store categories
 client.catalog.add_ons("PPSA01325_00").first(10)              # DLC for a title
+client.catalog.content_rating(product.concept_id)             # => PSN::ContentRating or nil
+client.catalog.media(product.concept_id)                      # => [PSN::MediaItem]
+client.catalog.compatibility_notices(product.concept_id)      # => PSN::CompatibilityNotices
+client.catalog.legal_text(product.concept_id)                 # => PSN::LegalText
+client.catalog.editions(product.concept_id)                   # => [PSN::Edition]
+client.catalog.concept_for_product(product.id)                # => PSN::StoreConcept
+client.catalog.add_ons_by_concept(product.concept_id).first(10)  # DLC keyed by concept
+client.catalog.plus_offers(:extra)                             # => [PSN::PlusOffer]
 
 # Trophy Game Help (PS+ hints)
 infos = client.trophies.game_help_availability(np_communication_id: "NPWR20188_00")

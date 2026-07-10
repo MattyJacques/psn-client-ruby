@@ -16,6 +16,11 @@ module PSN
       # The API rejects limits above 100 with a GraphQL Argument Validation
       # Error (verified live: 100 works, 101 does not).
       LIBRARY_LIMIT = 100
+      # library.playstation.com's registered variant of getUserGameList — not
+      # used by any call path. Recorded as a fallback because its full query
+      # text is public (psn-api), so it survives Sony rotating the app hash
+      # above. See docs/graphql-persisted-queries.md.
+      LIBRARY_HASH_WEB = "e780a6d8b921ef0c59ec01ea5c5255671272ca0d819edb61320914cf7a78b3ae"
       PURCHASED_OPERATION = "getPurchasedGameList"
       PURCHASED_HASH = "827a423f6a8ddca4107ac01395af2ec0eafd8396fc7fa204aaf9b7ed2eefa168"
       # purchasedTitlesRetrieve enforces no server-side size cap (verified live:
@@ -23,6 +28,10 @@ module PSN
       PURCHASED_PAGE_SIZE = 200
       PURCHASED_VARIABLES = { "isActive" => true, "platform" => %w[ps4 ps5],
                               "sortBy" => "ACTIVE_DATE", "sortDirection" => "desc" }.freeze
+      # friendsWhoPlayRetrieveByConceptId lives on the web store host and
+      # needs the normal Bearer token (anonymous calls get "Access denied").
+      FRIENDS_WHO_PLAY_OPERATION = "friendsWhoPlayRetrieveByConceptId"
+      FRIENDS_WHO_PLAY_HASH = "7bf9a61a9218dd810c16a7ca930eb7a2576b63b5639e887c62219a467434f9c2"
 
       def initialize(connection, users)
         @connection = connection
@@ -62,6 +71,15 @@ module PSN
           [response.dig("data", "purchasedTitlesRetrieve", "games") || [], nil]
         end
         paginator.map { |game| PurchasedGame.from_api(game) }
+      end
+
+      # PROVISIONAL: friends of the authenticated account who play a concept.
+      # Returns the raw response body until the payload shape is confirmed
+      # via bin/smoke (needs an authenticated account with friends); the
+      # model mapping lands once that shape is known.
+      def friends_who_play(concept_id)
+        @connection.graphql(FRIENDS_WHO_PLAY_OPERATION, { "conceptId" => concept_id.to_s },
+                            FRIENDS_WHO_PLAY_HASH, host: :web)
       end
     end
   end

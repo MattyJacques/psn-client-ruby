@@ -87,4 +87,16 @@ RSpec.describe PSN::Resources::Games do
       expect(connection).to have_received(:graphql).once
     end
   end
+
+  describe "#friends_who_play" do
+    it "returns the raw GraphQL body from the web host (provisional mapping)" do
+      body = { "data" => { "conceptRetrieve" => { "friendsWhoPlay" => [] } } }
+      allow(connection).to receive(:graphql)
+        .with("friendsWhoPlayRetrieveByConceptId", { "conceptId" => "10015869" },
+              described_class::FRIENDS_WHO_PLAY_HASH, host: :web)
+        .and_return(body)
+
+      expect(games.friends_who_play(10_015_869)).to eq(body)
+    end
+  end
 end
