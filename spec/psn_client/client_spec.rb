@@ -11,13 +11,15 @@ RSpec.describe PSN::Client do
     )
   end
 
-  it "exposes memoized resource objects" do
+  it "exposes memoized resource objects" do # rubocop:disable RSpec/MultipleExpectations
     client = described_class.new(refresh_token: "RT-0")
     expect(client.games).to be_a(PSN::Resources::Games)
     expect(client.trophies).to be_a(PSN::Resources::Trophies)
     expect(client.store).to be_a(PSN::Resources::Store)
     expect(client.profiles).to be_a(PSN::Resources::Profiles)
     expect(client.search).to equal(client.search)
+    expect(client.social).to be_a(PSN::Resources::Social)
+    expect(client.social).to equal(client.social)
   end
 
   it "exposes the search and catalog resources" do
