@@ -24,6 +24,7 @@ module PSN
     def devices = @devices ||= Resources::Devices.new(@connection)
     def media = @media ||= Resources::Media.new(@connection)
     def groups = @groups ||= Resources::Groups.new(@connection)
+    def browse = @browse ||= Resources::Browse.new(@connection)
 
     # Triggers authentication if it has not happened yet.
     def access_token = @auth.access_token
