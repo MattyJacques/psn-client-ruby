@@ -83,4 +83,85 @@ RSpec.describe PSN::Resources::Browse do
       expect(views.first.type).to eq("STORE_HERO_VIEW")
     end
   end
+
+  describe "#grid" do
+    let(:category_id) { "4cbf39e2-5749-4970-ba81-93a489e4570c" }
+
+    def stub_grid(size:, total:)
+      grid = fixture("ems_grid")
+      grid["pageInfo"]["totalCount"] = total
+      allow(connection).to receive(:graphql)
+        .with("metGetCategoryGrid",
+              { "id" => category_id, "pageArgs" => { "size" => size, "offset" => 0 } },
+              described_class::GRID_HASH, host: :mobile, headers: headers)
+        .and_return({ "data" => { "categoryGridRetrieve" => grid } })
+    end
+
+    it "walks offset pages of grid products" do
+      stub_grid(size: 50, total: 1)
+      result = browse.grid(category_id).to_a
+      expect(result.first).to be_a(PSN::CatalogItem)
+      expect(result.first.name).to eq("Example Game")
+    end
+
+    it "is lazy: .first(1) only issues one request" do
+      stub_grid(size: 50, total: 51)
+      expect(browse.grid(category_id).first(1).size).to eq(1)
+      expect(connection).to have_received(:graphql).once
+    end
+  end
+
+  describe "#facets" do
+    def stub_options_grid
+      allow(connection).to receive(:graphql)
+        .with("metGetCategoryGrid",
+              { "id" => "4cbf39e2-5749-4970-ba81-93a489e4570c",
+                "pageArgs" => { "size" => 1, "offset" => 0 } },
+              described_class::GRID_HASH, host: :mobile, headers: headers)
+        .and_return({ "data" => { "categoryGridRetrieve" => fixture("ems_grid") } })
+    end
+
+    it "returns GridOptions with the total product count" do
+      stub_options_grid
+      options = browse.facets("4cbf39e2-5749-4970-ba81-93a489e4570c")
+      expect(options).to be_a(PSN::GridOptions)
+      expect(options.total_count).to eq(2)
+    end
+
+    it "maps facets with per-value counts" do
+      stub_options_grid
+      facet = browse.facets("4cbf39e2-5749-4970-ba81-93a489e4570c").facets.first
+      expect(facet.name).to eq("storeDisplayClassification")
+      expect(facet.values.first.key).to eq("FULL_GAME")
+      expect(facet.values.first.count).to eq(7146)
+    end
+
+    it "maps sorting options" do
+      stub_options_grid
+      options = browse.facets("4cbf39e2-5749-4970-ba81-93a489e4570c")
+      expect(options.sorting_options.map(&:name)).to eq(%w[sales30 productName])
+      expect(options.sorting_options.last.ascending).to be(true)
+    end
+  end
+
+  describe "#strand" do
+    it "returns one strand's products via metGetCategoryStrands" do
+      product = fixture("ems_grid")["products"].first
+      variables = { "strands" => [{ "id" => "fbb563aa-c602-476d-bb92-fe7f35080205",
+                                    "pageArgs" => { "size" => 10, "offset" => 0 } }] }
+      allow(connection).to receive(:graphql)
+        .with("metGetCategoryStrands", variables, described_class::STRANDS_HASH,
+              host: :mobile, headers: headers)
+        .and_return({ "data" => { "categoryStrandsRetrieve" => [{ "products" => [product] }] } })
+
+      result = browse.strand("fbb563aa-c602-476d-bb92-fe7f35080205")
+      expect(result.first).to be_a(PSN::CatalogItem)
+    end
+
+    it "returns [] for an empty strand" do
+      allow(connection).to receive(:graphql)
+        .and_return({ "data" => { "categoryStrandsRetrieve" => [] } })
+      expect(browse.strand("fbb563aa-c602-476d-bb92-fe7f35080205")).to eq([])
+    end
+  end
 end

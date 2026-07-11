@@ -22,6 +22,11 @@ module PSN
       VIEWS_HASH = "6fd98ff7fecb603006fb5d92db176d5028435be163c8d1ee9f7c598ab4677dd1"
       DEFAULT_VIEW_OPERATION = "metGetDefaultView"
       DEFAULT_VIEW_HASH = "bec1b8a3b0bae8c08e3ce2c7fe2f38a69343434ccfbcdd82cc1f2e44f86b7c40"
+      GRID_OPERATION = "metGetCategoryGrid"
+      GRID_HASH = "b67a9e4414b80d8d762bf12a588c6125467ae0bb3bbe3cee3f7696c6984f8ef6"
+      STRANDS_OPERATION = "metGetCategoryStrands"
+      STRANDS_HASH = "55ab5f168bec56f8362b5519f59faaf786d4e1cfeabb8bc969d6a65545e14f4d"
+      PAGE_SIZE = 50
 
       def initialize(connection)
         @connection = connection
@@ -51,10 +56,44 @@ module PSN
         child_views.map { |view| StoreView.from_api(view) }
       end
 
+      # Browse a category grid lazily (same category UUIDs as
+      # Catalog::CATEGORIES and EMS GRID components). Unlike Catalog#category
+      # this is the App's grid, which also serves #facets.
+      def grid(category_id)
+        paginator = Paginator.offset(page_size: PAGE_SIZE) do |size, offset|
+          page = grid_page(category_id, size, offset)
+          [page["products"] || [], page.dig("pageInfo", "totalCount")]
+        end
+        paginator.map { |product| CatalogItem.from_api(product) }
+      end
+
+      # A category grid's facet and sorting options (with counts), from a
+      # single-item page.
+      def facets(category_id)
+        GridOptions.from_api(grid_page(category_id, 1, 0))
+      end
+
+      # Products in one strand (a curated store row). Strand IDs appear in EMS
+      # views and the web store's Apollo cache; there is no discovery endpoint.
+      def strand(strand_id, size: 10)
+        variables = { "strands" => [{ "id" => strand_id,
+                                      "pageArgs" => { "size" => size, "offset" => 0 } }] }
+        response = graphql(STRANDS_OPERATION, variables, STRANDS_HASH)
+        strand = (response.dig("data", "categoryStrandsRetrieve") || []).first || {}
+        (strand["products"] || []).map { |product| CatalogItem.from_api(product) }
+      end
+
       private
 
       def graphql(operation, variables, hash)
         @connection.graphql(operation, variables, hash, host: :mobile, headers: HEADERS)
+      end
+
+      def grid_page(category_id, size, offset)
+        response = graphql(GRID_OPERATION,
+                           { "id" => category_id, "pageArgs" => { "size" => size, "offset" => offset } },
+                           GRID_HASH)
+        response.dig("data", "categoryGridRetrieve") || {}
       end
     end
   end
