@@ -3,7 +3,7 @@
 RSpec.describe PSN::Resources::Search do
   subject(:search) { described_class.new(connection) }
 
-  let(:connection) { instance_double(PSN::Connection) }
+  let(:connection) { instance_double(PSN::Connection, language: "en-US") }
 
   describe "#games" do
     let(:game_item) { { "id" => "hit-1", "result" => fixture("catalog_product") } }
@@ -45,6 +45,17 @@ RSpec.describe PSN::Resources::Search do
     it "is lazy: .first(1) only issues the context request" do
       expect(search.games("fable").first(1).size).to eq(1)
       expect(connection).to have_received(:graphql).once
+    end
+
+    it "uses the connection's language for displayTitleLocale" do
+      gb = instance_double(PSN::Connection, language: "en-GB")
+      allow(gb).to receive(:graphql)
+        .with("metGetContextSearchResults",
+              hash_including("displayTitleLocale" => "en-GB"),
+              described_class::GAMES_CONTEXT_HASH, headers: described_class::HEADERS)
+        .and_return({ "data" => { "universalContextSearch" => { "results" => [] } } })
+
+      expect(described_class.new(gb).games("fable").to_a).to eq([])
     end
 
     it "rejects unknown domains" do
