@@ -1,0 +1,35 @@
+{
+  "id": "de9da6a2-cce6-11ee-a31f-a2110459ffc0",
+  "type": "STORE_HERO_VIEW",
+  "purpose": null,
+  "components": [
+    {
+      "componentType": "IMAGE",
+      "id": "6ecf5ebf-7b11-11f1-86ee-fad839fbef7d",
+      "imageUrl": "http://img.example.com/banner.png",
+      "link": null,
+      "name": "Promo Logo",
+      "ordinal": 2
+    },
+    {
+      "componentType": "SIMPLE_TEXT",
+      "id": "07f9f962-7413-11f1-be3d-eadc99d7dc7a",
+      "link": {
+        "localizedName": "cat.gma.Example_Promo",
+        "target": "e97029b2-8c26-4185-b6d4-aa528ee2c526",
+        "type": "EMS_CATEGORY"
+      },
+      "name": "Promo CTA",
+      "ordinal": 5,
+      "text": "Save Now"
+    },
+    {
+      "componentType": "GRID",
+      "id": "8205ed87-7991-11ef-8d2f-d6d98ecba136",
+      "categoryId": "e97029b2-8c26-4185-b6d4-aa528ee2c526",
+      "facetList": ["webBasePrice", "storeDisplayClassification"],
+      "sortOrderList": ["conceptName", "conceptReleaseDate"],
+      "name": "Default Grid"
+    }
+  ]
+}
