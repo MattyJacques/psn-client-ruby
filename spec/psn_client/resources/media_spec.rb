@@ -19,7 +19,7 @@ RSpec.describe PSN::Resources::Media do
 
     it "returns a lazy enumerator and defaults to empty when the key is missing" do
       allow(connection).to receive(:get).and_return({})
-      expect(media.captures).to be_a(Enumerator::Lazy)
+      expect(media.captures).to be_a(PSN::Collection)
       expect(media.captures.to_a).to eq([])
     end
   end

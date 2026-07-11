@@ -39,7 +39,7 @@ RSpec.describe PSN::Resources::Social do
         .with(:mobile, "/api/userProfile/v1/internal/users/me/friends", { "limit" => 100, "offset" => 100 })
         .and_return({ "friends" => Array.new(50) { |i| (100 + i).to_s }, "totalItemCount" => 150 })
 
-      expect(social.friends).to be_a(Enumerator::Lazy)
+      expect(social.friends).to be_a(PSN::Collection)
       expect(social.friends.to_a.size).to eq(150)
       expect(social.friends.first(3)).to eq(%w[0 1 2])
     end
