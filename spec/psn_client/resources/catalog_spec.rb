@@ -256,6 +256,71 @@ RSpec.describe PSN::Resources::Catalog do
     end
   end
 
+  describe "#game_info" do
+    it "returns a ConceptInfo via conceptRetrieveForGameInfo" do
+      allow(connection).to receive(:graphql)
+        .with("conceptRetrieveForGameInfo", { "conceptId" => "10015869" },
+              described_class::GAME_INFO_HASH, host: :web)
+        .and_return({ "data" => { "conceptRetrieve" => fixture("concept_game_info") } })
+
+      info = catalog.game_info("10015869")
+      expect(info).to be_a(PSN::ConceptInfo)
+      expect(info.short_description).to eq("A short blurb")
+      expect(info.genres).to eq(%w[Adventure Action])
+      expect(info.release_date).to eq(Time.utc(2027, 2, 23, 16, 0, 0))
+    end
+
+    it "returns a hollow model for an unknown concept" do
+      allow(connection).to receive(:graphql).and_return({ "data" => { "conceptRetrieve" => nil } })
+      expect(catalog.game_info("0").publisher_name).to be_nil
+    end
+  end
+
+  describe "#accessibility" do
+    it "returns accessibility notices by platform" do
+      allow(connection).to receive(:graphql)
+        .with("conceptRetrieveForAccessibilityFeatures", { "conceptId" => "10015869" },
+              described_class::ACCESSIBILITY_HASH, host: :web)
+        .and_return({ "data" => { "conceptRetrieve" => fixture("concept_accessibility") } })
+
+      info = catalog.accessibility("10015869")
+      expect(info).to be_a(PSN::AccessibilityInfo)
+      expect(info.platforms).to eq(["PS5"])
+      expect(info.notices_by_platform["PS5"].first["name"]).to eq("Subtitles and captions")
+    end
+  end
+
+  describe "#media_carousel" do
+    it "maps the concept-level media array to MediaItems" do
+      media = [{ "role" => "SCREENSHOT", "type" => "IMAGE", "url" => "http://img.example.com/1.png" }]
+      allow(connection).to receive(:graphql)
+        .with("conceptRetrieveForMediaCarousel", { "conceptId" => "10015869" },
+              described_class::MEDIA_CAROUSEL_HASH, host: :web)
+        .and_return({ "data" => { "conceptRetrieve" => { "media" => media } } })
+
+      items = catalog.media_carousel("10015869")
+      expect(items.first).to be_a(PSN::MediaItem)
+      expect(items.first).to be_image
+    end
+  end
+
+  describe "#upsell" do
+    it "returns upsell products as Editions" do
+      allow(connection).to receive(:graphql)
+        .with("conceptRetrieveForUpsellWithCtas", { "conceptId" => "10015869" },
+              described_class::UPSELL_HASH, host: :web)
+        .and_return({ "data" => { "conceptRetrieve" => { "products" => [fixture("edition_product")] } } })
+
+      editions = catalog.upsell("10015869")
+      expect(editions.first).to be_a(PSN::Edition)
+    end
+
+    it "returns [] when the concept has no upsell products" do
+      allow(connection).to receive(:graphql).and_return({ "data" => { "conceptRetrieve" => nil } })
+      expect(catalog.upsell("10015869")).to eq([])
+    end
+  end
+
   describe "#concept_for_product" do
     it "resolves a product to its StoreConcept in one request" do
       allow(connection).to receive(:graphql)

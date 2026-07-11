@@ -40,6 +40,14 @@ module PSN
       LEGAL_HASH = "b4c35dd0b4ec1541041699ac77e0f607d510d9b2b1e4ad9d2e743e1727f5aeb8"
       EDITIONS_OPERATION = "conceptRetrieveForCtasWithPrice"
       EDITIONS_HASH = "eab9d873f90d4ad98fd55f07b6a0a606e6b3925f2d03b70477234b79c1df30b5"
+      GAME_INFO_OPERATION = "conceptRetrieveForGameInfo"
+      GAME_INFO_HASH = "156bf37e6d6091b4d584ebf5f430a65e818b6120525dd82a0745352d21619da6"
+      ACCESSIBILITY_OPERATION = "conceptRetrieveForAccessibilityFeatures"
+      ACCESSIBILITY_HASH = "5ad27cf7d1f053068dabf46cc131518a7b7d686e9d64daa1a500d8faab0444c2"
+      MEDIA_CAROUSEL_OPERATION = "conceptRetrieveForMediaCarousel"
+      MEDIA_CAROUSEL_HASH = "404d96e0672728c19708b6519bcdc1427c5270ce76d9cb009cca39b8e68ace7b"
+      UPSELL_OPERATION = "conceptRetrieveForUpsellWithCtas"
+      UPSELL_HASH = "278822e6c6b9f304e4c788867b3e8a448c67847ac932d09213d5085811be3a18"
       CONCEPT_BY_PRODUCT_OPERATION = "metGetConceptByProductIdQuery"
       CONCEPT_BY_PRODUCT_HASH = "0a4c9f3693b3604df1c8341fdc3e481f42eeecf961a996baaa65e65a657a6433"
       CONCEPT_ADD_ONS_OPERATION = "getAddOnProductsByConcept"
@@ -129,6 +137,33 @@ module PSN
       # Every purchasable edition of a concept with its store CTA and price.
       def editions(concept_id)
         response = graphql(EDITIONS_OPERATION, { "conceptId" => concept_id.to_s }, EDITIONS_HASH)
+        products = response.dig("data", "conceptRetrieve", "products") || []
+        products.map { |product| Edition.from_api(product) }
+      end
+
+      # The product page's "game info" slice: descriptions, genres, publisher,
+      # release date — for when full #concept is more than a caller needs.
+      def game_info(concept_id)
+        response = graphql(GAME_INFO_OPERATION, { "conceptId" => concept_id.to_s }, GAME_INFO_HASH)
+        ConceptInfo.from_api(response.dig("data", "conceptRetrieve") || {})
+      end
+
+      # Accessibility notices grouped by platform.
+      def accessibility(concept_id)
+        response = graphql(ACCESSIBILITY_OPERATION, { "conceptId" => concept_id.to_s }, ACCESSIBILITY_HASH)
+        AccessibilityInfo.from_api(response.dig("data", "conceptRetrieve") || {})
+      end
+
+      # The product page's media carousel. Unlike #media (default product's
+      # assets) this set lives at concept level.
+      def media_carousel(concept_id)
+        response = graphql(MEDIA_CAROUSEL_OPERATION, { "conceptId" => concept_id.to_s }, MEDIA_CAROUSEL_HASH)
+        (response.dig("data", "conceptRetrieve", "media") || []).map { |entry| MediaItem.from_api(entry) }
+      end
+
+      # Upsell editions (products with store CTAs) shown on the product page.
+      def upsell(concept_id)
+        response = graphql(UPSELL_OPERATION, { "conceptId" => concept_id.to_s }, UPSELL_HASH)
         products = response.dig("data", "conceptRetrieve", "products") || []
         products.map { |product| Edition.from_api(product) }
       end

@@ -1,0 +1,8 @@
+{
+  "id": "10015869",
+  "name": "Example Quest",
+  "platforms": ["PS5"],
+  "accessibilityNoticesByPlatform": {
+    "PS5": [{ "name": "Subtitles and captions" }]
+  }
+}
