@@ -48,6 +48,8 @@ client.games.friends_who_play(concept_id) # => [PSN::User] friends playing a con
 # Profiles
 client.profiles.find                      # authenticated account
 client.profiles.find("a_friend")          # avatar, PS Plus, presence, trophy level
+client.profiles.find_by_account_id("1234567890")  # friends lists give bare IDs
+client.profiles.account_summary                   # PS+/EA Play/Ubisoft+ states
 
 # Social graph and presence
 client.social.friends.first(10)           # account IDs (lazy), as bare strings
@@ -81,6 +83,8 @@ client.trophies.earned(np_communication_id: "NPWR20188_00")
 client.trophies.earned("a_friend", np_communication_id: "NPWR00000_00", platform: "PS4")
 client.trophies.title_summary(title_ids: %w[PPSA01325_00 CUSA13323_00])
 client.trophies.groups(np_communication_id: "NPWR20188_00")  # base game vs DLC
+client.trophies.definitions(np_communication_id: "NPWR20188_00")       # trophy list, no account needed
+client.trophies.group_definitions(np_communication_id: "NPWR20188_00") # trophy groups, no account needed
 
 # Purchases and wishlist (authenticated account only)
 # client.store.transactions raises PSN::APIError — Sony decommissioned the endpoint
@@ -98,15 +102,6 @@ client.catalog.concept(product.concept_id)                    # => PSN::StoreCon
 client.catalog.pricing(product.concept_id)                    # => PSN::Price or nil
 client.catalog.product_rating(product.id)                     # => PSN::StarRating or nil
 client.catalog.category(:ps5_games).first(10)                 # browse store categories
-client.trophies.definitions(np_communication_id: "NPWR20188_00")  # trophy list, no account needed
-client.profiles.find_by_account_id("1234567890")                  # friends lists give bare IDs
-client.profiles.account_summary                                   # PS+/EA Play/Ubisoft+ states
-client.catalog.game_info("10015869")                              # product-page slices
-browse = client.browse                                            # app store browse tree
-home = browse.experience
-views = browse.views(home.nav_items.first.view_collection_id, experience_id: home.id)
-client.browse.grid(PSN::Resources::Catalog::CATEGORIES[:ps5_games]).first(5)
-client.browse.facets(PSN::Resources::Catalog::CATEGORIES[:ps5_games]).facets.map(&:display_name)
 client.catalog.add_ons("PPSA01325_00").first(10)              # DLC for a title
 client.catalog.content_rating(product.concept_id)             # => PSN::ContentRating or nil
 client.catalog.media(product.concept_id)                      # => [PSN::MediaItem]
@@ -117,6 +112,19 @@ client.catalog.concept_for_product(product.id)                # => PSN::StoreCon
 client.catalog.add_ons_by_concept(product.concept_id).first(10)  # DLC keyed by concept
 client.catalog.plus_offers(:extra)                             # => [PSN::PlusOffer]
 client.catalog.concept_for_title("CUSA01433_00")                    # => [PSN::TitleConcept]
+client.catalog.game_info("10015869")                              # product-page slices
+client.catalog.accessibility("10015869")                          # accessibility notices by platform
+client.catalog.media_carousel("10015869")                         # product-page media carousel
+client.catalog.upsell("10015869")                                 # upsell editions with store CTAs
+
+# Store browse (EMS)
+browse = client.browse                                            # app store browse tree
+home = browse.experience
+views = browse.views(home.nav_items.first.view_collection_id, experience_id: home.id)
+client.browse.grid(PSN::Resources::Catalog::CATEGORIES[:ps5_games]).first(5)
+client.browse.facets(PSN::Resources::Catalog::CATEGORIES[:ps5_games]).facets.map(&:display_name)
+client.browse.default_view("<category-uuid>", localized_key_id: "cat.gma....", experience_id: home.id)
+client.browse.strand("<strand-uuid>")
 
 # Trophy Game Help (PS+ hints)
 infos = client.trophies.game_help_availability(np_communication_id: "NPWR20188_00")

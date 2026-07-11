@@ -100,7 +100,8 @@ rotates anything:
 
 All tested live 2026-07-09 with no Authorization header, using
 `conceptId: "10015869"` / `productId: "UP6312-PPSA31381_00-0202050640964065"`
-(Fable). These would all slot into `Resources::Catalog`.
+(Fable). These would mostly slot into `Resources::Catalog`, save for
+`getDefaultView` below, which maps to `Browse#default_view`.
 
 ### Concept detail slices
 
