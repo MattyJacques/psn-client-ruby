@@ -98,6 +98,15 @@ client.catalog.concept(product.concept_id)                    # => PSN::StoreCon
 client.catalog.pricing(product.concept_id)                    # => PSN::Price or nil
 client.catalog.product_rating(product.id)                     # => PSN::StarRating or nil
 client.catalog.category(:ps5_games).first(10)                 # browse store categories
+client.trophies.definitions(np_communication_id: "NPWR20188_00")  # trophy list, no account needed
+client.profiles.find_by_account_id("1234567890")                  # friends lists give bare IDs
+client.profiles.account_summary                                   # PS+/EA Play/Ubisoft+ states
+client.catalog.game_info("10015869")                              # product-page slices
+browse = client.browse                                            # app store browse tree
+home = browse.experience
+views = browse.views(home.nav_items.first.view_collection_id, experience_id: home.id)
+client.browse.grid(PSN::Resources::Catalog::CATEGORIES[:ps5_games]).first(5)
+client.browse.facets(PSN::Resources::Catalog::CATEGORIES[:ps5_games]).facets.map(&:display_name)
 client.catalog.add_ons("PPSA01325_00").first(10)              # DLC for a title
 client.catalog.content_rating(product.concept_id)             # => PSN::ContentRating or nil
 client.catalog.media(product.concept_id)                      # => [PSN::MediaItem]
@@ -142,7 +151,9 @@ Note: the transaction/entitlement endpoints, the GraphQL persisted queries
 and the legacy profile endpoint are undocumented and may change; they live
 in `lib/psn_client/resources/store.rb`, `lib/psn_client/resources/games.rb`,
 `lib/psn_client/resources/profiles.rb`, `lib/psn_client/resources/search.rb`,
-`lib/psn_client/resources/catalog.rb` and the Game Help queries in
+`lib/psn_client/resources/catalog.rb`, `lib/psn_client/resources/browse.rb`
+(`client.browse` — EMS store browse: experience nav, views, category grids
+with facets, strands) and the Game Help queries in
 `lib/psn_client/resources/trophies.rb` if they need updating.
 
 ## License
