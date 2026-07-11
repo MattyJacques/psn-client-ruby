@@ -1,0 +1,13 @@
+{
+  "onlineId": "Example-Player",
+  "personalDetail": { "firstName": "Ex", "lastName": "Ample" },
+  "aboutMe": "Hello there",
+  "avatars": [
+    { "size": "s", "url": "http://img.example.com/avatar_s.png" },
+    { "size": "xl", "url": "http://img.example.com/avatar_xl.png" }
+  ],
+  "languages": ["en-GB"],
+  "isPlus": true,
+  "isOfficiallyVerified": false,
+  "isMe": false
+}

@@ -40,6 +40,13 @@ module PSN
         ShareableLink.from_api(@connection.get(:mobile, format(SHARE_PATH, account_id), {}))
       end
 
+      # Profile for a Sony numeric account ID — friends lists and presence
+      # responses return bare IDs. Leaner shape than #find (internal mobile
+      # endpoint; rejects "me", so pass a real ID).
+      def find_by_account_id(account_id)
+        BasicProfile.from_api(@connection.get(:mobile, format(PROFILE_BY_ACCOUNT_PATH, account_id), {}))
+      end
+
       private
 
       def own_account_id

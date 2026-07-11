@@ -95,4 +95,33 @@ RSpec.describe PSN::Resources::Profiles do
       expect(connection).to have_received(:get).with(:dms, "/api/v1/devices/accounts/me", {}).once
     end
   end
+
+  describe "#find_by_account_id" do
+    it "returns a BasicProfile from the internal profiles endpoint" do
+      allow(connection).to receive(:get)
+        .with(:mobile, "/api/userProfile/v1/internal/users/1234567890/profiles", {})
+        .and_return(fixture("basic_profile"))
+
+      profile = profiles.find_by_account_id("1234567890")
+      expect(profile).to be_a(PSN::BasicProfile)
+      expect(profile.online_id).to eq("Example-Player")
+      expect(profile.first_name).to eq("Ex")
+      expect(profile).to be_plus
+      expect(profile).not_to be_me
+    end
+
+    it "maps avatars into a size-keyed URL hash" do
+      allow(connection).to receive(:get).and_return(fixture("basic_profile"))
+
+      profile = profiles.find_by_account_id("1234567890")
+      expect(profile.avatar_urls["xl"]).to eq("http://img.example.com/avatar_xl.png")
+    end
+
+    it "handles profiles without personalDetail" do
+      allow(connection).to receive(:get)
+        .and_return(fixture("basic_profile").except("personalDetail"))
+
+      expect(profiles.find_by_account_id("1234567890").first_name).to be_nil
+    end
+  end
 end
