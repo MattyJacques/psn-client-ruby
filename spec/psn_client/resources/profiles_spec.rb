@@ -124,4 +124,33 @@ RSpec.describe PSN::Resources::Profiles do
       expect(profiles.find_by_account_id("1234567890").first_name).to be_nil
     end
   end
+
+  describe "#account_summary" do
+    def stub_oracle
+      allow(connection).to receive(:graphql)
+        .with("getProfileOracle", {}, described_class::ORACLE_HASH,
+              host: :web, headers: { "apollographql-client-name" => "oracle" })
+        .and_return({ "data" => { "oracleUserProfileRetrieve" => fixture("account_summary") } })
+    end
+
+    it "returns the oracle profile summary" do
+      stub_oracle
+      summary = profiles.account_summary
+      expect(summary).to be_a(PSN::AccountSummary)
+      expect(summary.online_id).to eq("Example-Player")
+      expect(summary.avatar_url).to eq("http://img.example.com/avatar_xl.png")
+      expect(summary).to be_ps_plus
+    end
+
+    it "maps subscription states" do
+      stub_oracle
+      subscriptions = profiles.account_summary.subscriptions
+
+      plus = subscriptions.find { |s| s.type == "PSPLUS" }
+      expect(plus.tier).to eq("TIER_30")
+      expect(plus.duration).to eq("12 MONTH")
+      expect(plus).to be_active
+      expect(subscriptions.find { |s| s.type == "UBISOFT_PLUS" }).not_to be_active
+    end
+  end
 end
