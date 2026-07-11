@@ -3,6 +3,10 @@ module PSN
     class TotalState < ::Struct[untyped]
       attr_accessor known: bool
       attr_accessor value: Integer?
+
+      def initialize: (bool known, Integer? value) -> void
+
+      def self.new: (bool known, Integer? value) -> TotalState
     end
 
     def initialize: (Enumerator::Lazy[untyped, untyped] enum,

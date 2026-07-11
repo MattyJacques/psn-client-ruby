@@ -1,3 +1,9 @@
+# TEMPORARY — placeholder declarations for models/resources not yet typed.
+# Tasks 8–9 replace these with real signatures and then delete this file.
+# Model from_api returns untyped here (Data.define/steep interaction with
+# forward references); resource initialize sigs are exact-arity to avoid
+# steep warnings at Client's construction sites.
+
 module PSN
   class AccessibilityInfo
     def self.from_api: (::Hash[String, untyped]) -> untyped

@@ -16,7 +16,7 @@ module PSN
     private
 
     def notifying_rotation: [T] () { () -> T } -> T
-    def expired?: () -> bool
+    def expired?: () -> boolish
     def authenticate: () -> String
     def refresh: () -> String
     def authorization_code: () -> String

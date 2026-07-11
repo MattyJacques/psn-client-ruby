@@ -17,7 +17,7 @@ module PSN
     private
 
     def request: (Symbol host, Symbol verb, String path, untyped payload,
-                  headers: ::Hash[String, String], ?retried: bool) -> untyped
+                  ?headers: ::Hash[String, String], ?retried: bool) -> untyped
     def perform: (Symbol host, Symbol verb, String path, untyped payload, ::Hash[String, String] headers) -> untyped
     def handle_errors: (untyped resp) -> void
     def forbidden_error: (untyped resp, ::Hash[Symbol, untyped] response) -> Error
