@@ -1,0 +1,23 @@
+module PSN
+  class Client
+    def initialize: (?npsso: String?, ?refresh_token: String?, ?language: String,
+                     ?on_token_refresh: (^(String) -> void)?) -> void
+    def games: () -> Resources::Games
+    def trophies: () -> Resources::Trophies
+    def store: () -> Resources::Store
+    def profiles: () -> Resources::Profiles
+    def search: () -> Resources::Search
+    def catalog: () -> Resources::Catalog
+    def social: () -> Resources::Social
+    def devices: () -> Resources::Devices
+    def media: () -> Resources::Media
+    def groups: () -> Resources::Groups
+    def browse: () -> Resources::Browse
+    def access_token: () -> String
+    def refresh_token: () -> String?
+
+    private
+
+    def users: () -> Resources::Users
+  end
+end

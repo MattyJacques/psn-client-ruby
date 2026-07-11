@@ -1,0 +1,14 @@
+module PSN
+  module Mapping
+    GAME_PLATFORMS: ::Hash[String, String]
+
+    def self?.time: (String? value) -> Time?
+    def self?.epoch_ms: ((String | Integer)? value) -> Time?
+    def self?.duration_seconds: (String? value) -> Integer?
+    def self?.grade_counts: (::Hash[String, untyped]? hash) -> ::Hash[Symbol, Integer]?
+    def self?.platform: (String? category) -> String?
+    def self?.subscription: (String? value) -> String?
+    def self?.cover_url: (::Array[::Hash[String, untyped]] media) -> String?
+    def self?.description: (::Hash[String, untyped] hash, String type) -> String?
+  end
+end

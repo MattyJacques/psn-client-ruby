@@ -1,0 +1,3 @@
+module Faraday
+  def self.new: (*untyped, **untyped) ?{ (untyped) -> void } -> untyped
+end

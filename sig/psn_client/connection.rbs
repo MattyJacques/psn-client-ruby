@@ -1,0 +1,28 @@
+module PSN
+  class Connection
+    HOSTS: ::Hash[Symbol, String]
+    DEFAULT_RETRY_OPTIONS: ::Hash[Symbol, untyped]
+    DEFAULT_LANGUAGE: String
+    GRAPHQL_PATH: String
+    GRAPHQL_HEADERS: ::Hash[String, String]
+
+    attr_reader language: String
+
+    def initialize: (Auth auth, ?retry_options: ::Hash[Symbol, untyped]?, ?language: String) -> void
+    def get: (Symbol host, String path, ?::Hash[String, untyped] params, ?headers: ::Hash[String, String]) -> untyped
+    def post: (Symbol host, String path, untyped body) -> untyped
+    def graphql: (String operation_name, ::Hash[String, untyped] variables, String sha256_hash,
+                  ?host: Symbol, ?headers: ::Hash[String, String]) -> untyped
+
+    private
+
+    def request: (Symbol host, Symbol verb, String path, untyped payload,
+                  headers: ::Hash[String, String], ?retried: bool) -> untyped
+    def perform: (Symbol host, Symbol verb, String path, untyped payload, ::Hash[String, String] headers) -> untyped
+    def handle_errors: (untyped resp) -> void
+    def forbidden_error: (untyped resp, ::Hash[Symbol, untyped] response) -> Error
+    def api_error_message: (untyped body) -> String?
+    def handle_graphql_errors: (untyped body) -> void
+    def connection: (Symbol host) -> untyped
+  end
+end

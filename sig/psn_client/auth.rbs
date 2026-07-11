@@ -1,0 +1,28 @@
+module PSN
+  class Auth
+    AUTH_BASE: String
+    CLIENT_ID: String
+    CLIENT_SECRET: String
+    REDIRECT_URI: String
+    SCOPE: String
+    EXPIRY_BUFFER: Integer
+
+    attr_reader refresh_token: String?
+
+    def initialize: (?npsso: String?, ?refresh_token: String?, ?on_token_refresh: (^(String) -> void)?) -> void
+    def access_token: () -> String
+    def refresh!: () -> String
+
+    private
+
+    def notifying_rotation: [T] () { () -> T } -> T
+    def expired?: () -> bool
+    def authenticate: () -> String
+    def refresh: () -> String
+    def authorization_code: () -> String
+    def extract_code: (untyped resp) -> String?
+    def request_token: (::Hash[String, String] params) -> String
+    def apply_tokens: (::Hash[String, untyped] data) -> String
+    def http: () -> untyped
+  end
+end
