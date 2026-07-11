@@ -134,6 +134,41 @@ RSpec.describe PSN::Resources::Trophies do
     end
   end
 
+  describe "#definitions" do
+    it "returns lazy Trophy definitions without account context" do
+      allow(connection).to receive(:get)
+        .with(:mobile, "/api/trophy/v1/npCommunicationIds/NPWR20188_00/trophyGroups/all/trophies", {})
+        .and_return({ "trophies" => [fixture("trophy_definition")] })
+
+      result = trophies.definitions(np_communication_id: "NPWR20188_00").to_a
+      expect(result.first).to be_a(PSN::Trophy)
+      expect(result.first.name).to eq("One Small Step")
+      expect(result.first).not_to be_earned
+    end
+
+    it "adds npServiceName=trophy for non-PS5 platforms" do
+      allow(connection).to receive(:get)
+        .with(:mobile, "/api/trophy/v1/npCommunicationIds/NPWR20188_00/trophyGroups/all/trophies",
+              { "npServiceName" => "trophy" })
+        .and_return({ "trophies" => [] })
+
+      expect(trophies.definitions(np_communication_id: "NPWR20188_00", platform: "PS4").to_a).to eq([])
+    end
+  end
+
+  describe "#group_definitions" do
+    it "returns lazy TrophyGroup definitions without progress" do
+      allow(connection).to receive(:get)
+        .with(:mobile, "/api/trophy/v1/npCommunicationIds/NPWR20188_00/trophyGroups", {})
+        .and_return({ "trophyGroups" => [fixture("trophy_group_definition")] })
+
+      result = trophies.group_definitions(np_communication_id: "NPWR20188_00").to_a
+      expect(result.first).to be_a(PSN::TrophyGroup)
+      expect(result.first.group_id).to eq("default")
+      expect(result.first.progress).to be_nil
+    end
+  end
+
   describe "#game_help_availability" do
     it "lists trophies with Game Help via metGetHintAvailability" do
       response = { "data" => { "hintAvailabilityRetrieve" => { "trophies" => [fixture("help_availability")] } } }
