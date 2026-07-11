@@ -28,6 +28,36 @@ or a hash no longer matches the schema, and
 `Access denied! You need to be authorized to perform this action!` when an
 anonymous call hits an account-scoped operation.
 
+### EMS variable recipes (2026-07-11)
+
+The EMS (Experience Management System) queries and the oracle profile queries
+have no public schema — variable shapes were reverse-engineered from the
+store's own network traffic. Recorded here so they can be re-derived if Sony
+rotates anything:
+
+- The EMS `clientId` (`b6de8d4d-bf9b-11ee-ad2a-aea73dc1ea43`,
+  `Resources::Browse::EMS_CLIENT_ID`) comes from `store.playstation.com`'s
+  server-rendered HTML: the embedded Apollo cache contains a call to
+  `emsExperienceRetrieve({"clientId":"b6de8d4d-…"})`, and the page's
+  `data-telemetry-meta` attributes carry `emsExperienceId` / `emsViewId` /
+  `emsCategoryId` for the experience/view UUIDs.
+- `metGetViews` takes `{"viewInputs": [{"viewId": <uuid>, "experienceId": <uuid>}]}`;
+  `metGetCategoryGrid`/`metGetCategoryGrids` take `{"id"/"grids": [...], "pageArgs": {"size", "offset"}}`;
+  `metGetCategoryStrands` takes `{"strands": [{"id", "pageArgs"}]}`.
+- `localizedKeyId` (a `metGetDefaultView` variable) values are the
+  `localizedName` strings carried by EMS links, e.g. `cat.gma.July_Savings` —
+  there is no enumeration endpoint, only ones seen in the wild.
+- The oracle queries (`getProfileOracle`, `queryOracleUserProfileFullSubscription`)
+  400 with `Cannot query field "oracleUserProfileRetrieve"` unless the request
+  carries the `apollographql-client-name: oracle` header — that header routes
+  the request to the web toolbar's schema (`web-toolbar` also works; the gem
+  uses `oracle`).
+- General probing technique: Sony's validation errors name the missing
+  variable and its GraphQL type, so an unknown operation's shape can be
+  recovered by sending `{}`, reading the error, then retrying with `[{}]` (or
+  the named field) until the errors stop — this is how the `viewInputs`/
+  `grids`/`strands` array-of-object shapes above were found.
+
 ## Already implemented in the gem
 
 | Operation | Host | Resource |
@@ -55,12 +85,23 @@ anonymous call hits an account-scoped operation.
 | `getAddOnProductsByConcept` (`23c26f56…`) | web | `resources/catalog.rb` |
 | `featuresRetrieve` (`010870e8…`) | web | `resources/catalog.rb` |
 | `friendsWhoPlayRetrieveByConceptId` (`7bf9a61a…`, provisional) | web | `resources/games.rb` |
+| `conceptRetrieveForGameInfo` (`156bf37e…`) | web | `resources/catalog.rb` |
+| `conceptRetrieveForAccessibilityFeatures` (`5ad27cf7…`) | web | `resources/catalog.rb` |
+| `conceptRetrieveForMediaCarousel` (`404d96e0…`) | web | `resources/catalog.rb` |
+| `conceptRetrieveForUpsellWithCtas` (`278822e6…`) | web | `resources/catalog.rb` |
+| `metGetExperience` (`054e61ee…`) | mobile | `resources/browse.rb` |
+| `metGetViews` (`6fd98ff7…`) | mobile | `resources/browse.rb` |
+| `metGetDefaultView` (`bec1b8a3…`) | mobile | `resources/browse.rb` |
+| `metGetCategoryGrid` (`b67a9e44…`) | mobile | `resources/browse.rb` |
+| `metGetCategoryStrands` (`55ab5f16…`) | mobile | `resources/browse.rb` |
+| `getProfileOracle` (`fc0d765f…`) | web + `oracle` header | `resources/profiles.rb` |
 
 ## Verified candidates (anonymous, `:web` host)
 
 All tested live 2026-07-09 with no Authorization header, using
 `conceptId: "10015869"` / `productId: "UP6312-PPSA31381_00-0202050640964065"`
-(Fable). These would all slot into `Resources::Catalog`.
+(Fable). These would mostly slot into `Resources::Catalog`, save for
+`getDefaultView` below, which maps to `Browse#default_view`.
 
 ### Concept detail slices
 
@@ -70,12 +111,8 @@ full `metGetConceptById` payload is more than a caller needs.
 
 | Operation | sha256Hash | Returns |
 | --- | --- | --- |
-| `conceptRetrieveForGameInfo` | `156bf37e6d6091b4d584ebf5f430a65e818b6120525dd82a0745352d21619da6` | descriptions, localizedGenres, publisherName, releaseDate |
 | `conceptRetrieveForGameTitle` | `d244286e38044363f1fb6707f719d41558c74542fc421503a38124ca87068812` | name, ownedTitles, publisherName, releaseDate, descriptions |
 | `conceptRetrieveForGameTitle` (alt) | `e9faf8c60bf31d71c5e72ff36f9f5ebc713e62d93e975e538e72c1875de8c27b` | same minus descriptions — two registered variants of one operation; both live |
-| `conceptRetrieveForAccessibilityFeatures` | `5ad27cf7d1f053068dabf46cc131518a7b7d686e9d64daa1a500d8faab0444c2` | accessibilityNoticesByPlatform, platforms |
-| `conceptRetrieveForMediaCarousel` | `404d96e0672728c19708b6519bcdc1427c5270ce76d9cb009cca39b8e68ace7b` | media (carousel set) |
-| `conceptRetrieveForUpsellWithCtas` | `278822e6c6b9f304e4c788867b3e8a448c67847ac932d09213d5085811be3a18` | products (upsell editions), media |
 | `queryRetrieveTelemetryDataPDPConcept` | `3fc354c90bf032e8ce86f7ebbe761e8a9315b23d564612ff4587f8a6bbc16d19` | minimal id/name/defaultProduct (telemetry helper; little value) |
 
 ### Other verified queries
@@ -86,11 +123,12 @@ full `metGetConceptById` payload is more than a caller needs.
   concept, topCategory, webctas), `wcaConceptStarRatingRetrive`
   `8c3dea41cf2f56baf3e0e0bfdf5e7298fa2941ab7488b8d7859bb0200dfb99b9`. Useful
   as fallbacks if Sony retires the current hashes.
-- **`getDefaultView`** —
-  `fc2998417fe7297a559b7f3798bf1c5e1650d88e926269bf6d8bd2cce3fddc76`. Hash is
-  registered but requires `categoryId` (String!), `experienceId` (ID!) and
-  `localizedKeyId` (String!) — the web store's view/experience system.
-  Variable values not yet reverse-engineered; parked.
+- **`getDefaultView`** (web host) —
+  `fc2998417fe7297a559b7f3798bf1c5e1650d88e926269bf6d8bd2cce3fddc76`. Same
+  `categoryId` (String!) / `experienceId` (ID!) / `localizedKeyId` (String!)
+  trio as `metGetDefaultView`, now implemented as `Browse#default_view` (see
+  "Already implemented in the gem"); this is the web store's version of the
+  same operation, not yet needed since the mobile one covers the use case.
 
 ## Known hashes that need auth (unverified — check with `bin/smoke`)
 
@@ -99,27 +137,27 @@ they are account-scoped. Hashes from the ioBroker adapter and psn-php maps.
 `friendsWhoPlayRetrieveByConceptId` and the `getUserGameList` web variant are
 no longer listed here — both are now recorded in the gem
 (`resources/games.rb`: `#friends_who_play` is a provisional method for the
-former, `LIBRARY_HASH_WEB` is a fallback constant for the latter).
+former, `LIBRARY_HASH_WEB` is a fallback constant for the latter). Likewise
+`metGetExperience`, `metGetViews`, `metGetDefaultView`, `metGetCategoryGrid`,
+`metGetCategoryStrands` and `getProfileOracle` moved to "Already implemented"
+once their variable shapes were reverse-engineered (see the EMS variable
+recipes above).
 
 | Operation | sha256Hash | Notes |
 | --- | --- | --- |
 | `backwardCompatibility` | `be14d5cbae5a065dc9ef5e33f7de93d1f6c01c6aa28e4b44b94bea37e4fd0c03` | hash registered on web host; variables unknown |
 | `metGetWebCheckoutCart` | `2d4165c4de76877a32f3d08c91ce2af0e01d69300131fed0a8022868235e85b1` | app checkout cart |
-| `metGetExperience` | `054e61ee68bbeadc21435caebcc4f2bba0919a99b06629d141b0b82dc55f10c4` | app store "experience" hub |
-| `metGetViews` | `6fd98ff7fecb603006fb5d92db176d5028435be163c8d1ee9f7c598ab4677dd1` | app store browse: views → |
-| `metGetDefaultView` | `bec1b8a3b0bae8c08e3ce2c7fe2f38a69343434ccfbcdd82cc1f2e44f86b7c40` | → default view → |
-| `metGetCategoryGrids` | `cc0b6513521c59a321bf62334fa23a92f22cd2ce1abe9f014fadac6379e414a8` | → grids → |
-| `metGetCategoryGrid` | `b67a9e4414b80d8d762bf12a588c6125467ae0bb3bbe3cee3f7696c6984f8ef6` | → one grid → |
-| `metGetCategoryStrands` | `55ab5f168bec56f8362b5519f59faaf786d4e1cfeabb8bc969d6a65545e14f4d` | → strands (the app's store navigation tree) |
-| `queryOracleUserProfileFullSubscription` | `3fe5e3cb6e16f83be98ccaa694823e10bdf428f9c7ff8e314b8464ad8976319d` | web account/subscription state ("oracle" = web account header) |
-| `getAccountOracle` | `27a52f5d0866e53ce12c036030dae21c62fe65ab8debbceff1c40cd6b462d96d` | ditto |
-| `getProfileOracle` | `fc0d765f537f3dce3e0d91c71e85daa401042ba43066acde9f8f584faced10df` | ditto |
+| `metGetCategoryGrids` | `cc0b6513521c59a321bf62334fa23a92f22cd2ce1abe9f014fadac6379e414a8` | verified live 2026-07-11 — batch variant of `metGetCategoryGrid` (`{"grids": [{"id", "pageArgs"}]}`); not implemented (same data) |
+| `queryOracleUserProfileFullSubscription` | `3fe5e3cb6e16f83be98ccaa694823e10bdf428f9c7ff8e314b8464ad8976319d` | verified live 2026-07-11 with the oracle header — fallback for `getProfileOracle` (adds `isAuthorized`, drops `name`/`avatar`) |
 
 ## Dead or not worth implementing
 
 - **`getCartItemCount`** `98136bcbc72e0fefccd8ecd6d3b3309225a6889c19df6e54581d86ff1c15d88a`
   — schema now rejects it (`Cannot query field "webCheckoutCartRetrieve"`);
   the hash outlived the schema. Kept here so nobody re-tries it.
+- **`getAccountOracle`** `27a52f5d0866e53ce12c036030dae21c62fe65ab8debbceff1c40cd6b462d96d`
+  — verified live 2026-07-11 (`{"accountId": <id>}`) but returns the
+  PlayStation Stars loyalty account — service shuts down 2026-11-02.
 - **PlayStation Stars loyalty queries** — `metGetAccount`,
   `metGetPointsHistory`, `metGetUserCollectibles`, `metGetCollectibleDisplay`,
   `metGetCollectibleScenes`, `metGetStatusLevels`, `metGetCampaignGroup`,

@@ -1,0 +1,32 @@
+{
+  "concepts": null,
+  "facetOptions": [
+    {
+      "displayName": "Type",
+      "name": "storeDisplayClassification",
+      "values": [
+        { "count": 7146, "displayName": "Full Game", "key": "FULL_GAME" },
+        { "count": 1440, "displayName": "Game Bundle", "key": "GAME_BUNDLE" }
+      ]
+    }
+  ],
+  "filtersApplied": null,
+  "pageInfo": { "totalCount": 2 },
+  "products": [
+    {
+      "__typename": "Product",
+      "id": "UP0000-PPSA00000_00-0000000000000000",
+      "localizedStoreDisplayClassification": "Full Game",
+      "media": [{ "role": "GAMEHUB_COVER_ART", "type": "IMAGE", "url": "http://img.example.com/cover.png" }],
+      "name": "Example Game",
+      "platforms": ["PS5"],
+      "price": null,
+      "storeDisplayClassification": "FULL_GAME"
+    }
+  ],
+  "sortedBy": { "displayName": "productReleaseDate", "isAscending": false, "name": "productReleaseDate" },
+  "sortingOptions": [
+    { "displayName": "Best Selling", "isAscending": false, "name": "sales30" },
+    { "displayName": "Name (A - Z)", "isAscending": true, "name": "productName" }
+  ]
+}

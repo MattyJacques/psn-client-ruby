@@ -37,7 +37,7 @@ Cross-cutting pieces:
 
 ### Undocumented endpoints
 
-The transaction/entitlement endpoints, the GraphQL persisted queries (operation names + sha256 hashes), and the legacy profile2 endpoint are undocumented Sony internals that can change without notice. Knowledge of each is deliberately confined to one file each: `resources/store.rb`, `resources/games.rb`, `resources/profiles.rb`, `resources/search.rb` (game/user search), `resources/catalog.rb` (web-host store catalog, served anonymously), and the Game Help queries in `resources/trophies.rb`. Quirks discovered by live testing (e.g. the library limit cap of 100, profile2 rejecting `"me"`) are recorded in comments there — keep them accurate, and verify changes with `bin/smoke`.
+The transaction/entitlement endpoints, the GraphQL persisted queries (operation names + sha256 hashes), and the legacy profile2 endpoint are undocumented Sony internals that can change without notice. Knowledge of each is deliberately confined to one file each: `resources/store.rb`, `resources/games.rb`, `resources/profiles.rb`, `resources/search.rb` (game/user search), `resources/catalog.rb` (web-host store catalog, served anonymously), `resources/browse.rb` (mobile-host EMS store browse tree), and the Game Help queries in `resources/trophies.rb`. Quirks discovered by live testing (e.g. the library limit cap of 100, profile2 rejecting `"me"`) are recorded in comments there — keep them accurate, and verify changes with `bin/smoke`.
 
 ## Tests
 

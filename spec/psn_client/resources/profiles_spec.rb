@@ -95,4 +95,62 @@ RSpec.describe PSN::Resources::Profiles do
       expect(connection).to have_received(:get).with(:dms, "/api/v1/devices/accounts/me", {}).once
     end
   end
+
+  describe "#find_by_account_id" do
+    it "returns a BasicProfile from the internal profiles endpoint" do
+      allow(connection).to receive(:get)
+        .with(:mobile, "/api/userProfile/v1/internal/users/1234567890/profiles", {})
+        .and_return(fixture("basic_profile"))
+
+      profile = profiles.find_by_account_id("1234567890")
+      expect(profile).to be_a(PSN::BasicProfile)
+      expect(profile.online_id).to eq("Example-Player")
+      expect(profile.first_name).to eq("Ex")
+      expect(profile).to be_plus
+      expect(profile).not_to be_me
+    end
+
+    it "maps avatars into a size-keyed URL hash" do
+      allow(connection).to receive(:get).and_return(fixture("basic_profile"))
+
+      profile = profiles.find_by_account_id("1234567890")
+      expect(profile.avatar_urls["xl"]).to eq("http://img.example.com/avatar_xl.png")
+    end
+
+    it "handles profiles without personalDetail" do
+      allow(connection).to receive(:get)
+        .and_return(fixture("basic_profile").except("personalDetail"))
+
+      expect(profiles.find_by_account_id("1234567890").first_name).to be_nil
+    end
+  end
+
+  describe "#account_summary" do
+    def stub_oracle
+      allow(connection).to receive(:graphql)
+        .with("getProfileOracle", {}, described_class::ORACLE_HASH,
+              host: :web, headers: { "apollographql-client-name" => "oracle" })
+        .and_return({ "data" => { "oracleUserProfileRetrieve" => fixture("account_summary") } })
+    end
+
+    it "returns the oracle profile summary" do
+      stub_oracle
+      summary = profiles.account_summary
+      expect(summary).to be_a(PSN::AccountSummary)
+      expect(summary.online_id).to eq("Example-Player")
+      expect(summary.avatar_url).to eq("http://img.example.com/avatar_xl.png")
+      expect(summary).to be_ps_plus
+    end
+
+    it "maps subscription states" do
+      stub_oracle
+      subscriptions = profiles.account_summary.subscriptions
+
+      plus = subscriptions.find { |s| s.type == "PSPLUS" }
+      expect(plus.tier).to eq("TIER_30")
+      expect(plus.duration).to eq("12 MONTH")
+      expect(plus).to be_active
+      expect(subscriptions.find { |s| s.type == "UBISOFT_PLUS" }).not_to be_active
+    end
+  end
 end

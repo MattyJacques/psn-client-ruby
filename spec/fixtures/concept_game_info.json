@@ -1,0 +1,11 @@
+{
+  "id": "10015869",
+  "invariantName": "Example Quest",
+  "publisherName": "Example Studios",
+  "releaseDate": { "type": "DAY_MONTH_YEAR", "value": "2027-02-23T16:00:00Z" },
+  "localizedGenres": [{ "value": "Adventure" }, { "value": "Action" }],
+  "descriptions": [
+    { "subType": "NONE", "type": "SHORT", "value": "A short blurb" },
+    { "subType": "NONE", "type": "LONG", "value": "A much longer description" }
+  ]
+}

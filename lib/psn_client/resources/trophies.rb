@@ -75,6 +75,22 @@ module PSN
         merge_groups(definitions["trophyGroups"] || [], earned["trophyGroups"] || []).lazy
       end
 
+      # Trophy definitions for a title with no account context — works for games
+      # the account has never played (where #earned has nothing to merge).
+      def definitions(np_communication_id:, platform: nil)
+        response = @connection.get(:mobile, format(DEFINITIONS_PATH, np_communication_id),
+                                   service_params(platform))
+        (response["trophies"] || []).lazy.map { |trophy| Trophy.from_api(trophy) }
+      end
+
+      # Trophy group definitions (base game "default", DLC "001"...) without
+      # account progress.
+      def group_definitions(np_communication_id:, platform: nil)
+        response = @connection.get(:mobile, format(GROUPS_DEFINITIONS_PATH, np_communication_id),
+                                   service_params(platform))
+        (response["trophyGroups"] || []).lazy.map { |group| TrophyGroup.from_api(group) }
+      end
+
       # Trophies in a title that have Game Help available. Pass trophy_ids
       # to limit the check; the results feed straight into #game_help.
       def game_help_availability(np_communication_id:, trophy_ids: nil)

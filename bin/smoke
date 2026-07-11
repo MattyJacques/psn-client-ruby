@@ -228,5 +228,40 @@ section("Catalog: concept for most recent played title") do
   client.catalog.concept_for_title(id).each { |c| puts "#{c.id} #{c.name} titles=#{c.title_ids.size}" }
 end
 
+section("Trophy definitions (no account context)") do
+  first = client.trophies.definitions(np_communication_id: "NPWR20188_00").first(3)
+  first.each { |t| puts "#{t.grade} #{t.name}" }
+end
+
+section("Profile by account ID") do
+  summary = client.profiles.account_summary
+  profile = client.profiles.find_by_account_id(summary.account_id)
+  puts "#{profile.online_id} plus=#{profile.plus?} me=#{profile.me?}"
+end
+
+section("Account subscriptions (oracle)") do
+  summary = client.profiles.account_summary
+  summary.subscriptions.each { |s| puts "#{s.type}: #{s.status} #{s.tier}".strip }
+end
+
+section("Catalog slices") do
+  info = client.catalog.game_info("10015869")
+  puts "#{info.publisher_name} — #{info.genres.join(', ')} — #{info.release_date}"
+  puts "carousel media: #{client.catalog.media_carousel('10015869').size}"
+  puts "upsell editions: #{client.catalog.upsell('10015869').map(&:name).join(' | ')}"
+  puts "accessibility platforms: #{client.catalog.accessibility('10015869').platforms.join(',')}"
+end
+
+section("Store browse (EMS)") do
+  home = client.browse.experience
+  puts "nav: #{home.nav_items.map(&:name).join(' / ')}"
+  view = client.browse.views(home.nav_items.first.view_collection_id, experience_id: home.id).first
+  puts "first view #{view.id} components: #{view.components.map(&:component_type).tally}"
+  grid_category = PSN::Resources::Catalog::CATEGORIES[:ps5_games]
+  client.browse.grid(grid_category).first(3).each { |g| puts "#{g.name} #{g.price&.base_price || '-'}" }
+  options = client.browse.facets(grid_category)
+  puts "facets: #{options.facets.map(&:display_name).join(', ')} (#{options.total_count} products)"
+end
+
 puts "\nRefresh token (persist for next session):"
 puts client.refresh_token

@@ -18,6 +18,12 @@ module PSN
       PROFILE_BY_ACCOUNT_PATH = "/api/userProfile/v1/internal/users/%s/profiles"
       SHARE_PATH = "/api/cpss/v1/share/profile/%s"
       ONLINE_ID_PATTERN = /\A[a-zA-Z0-9_-]{3,16}\z/
+      ORACLE_OPERATION = "getProfileOracle"
+      ORACLE_HASH = "fc0d765f537f3dce3e0d91c71e85daa401042ba43066acde9f8f584faced10df"
+      # The oracleUserProfileRetrieve field only exists on the web toolbar's
+      # schema; without this client-name header the same host answers
+      # HTTP 400 "Cannot query field" (verified live 2026-07-11).
+      ORACLE_HEADERS = { "apollographql-client-name" => "oracle" }.freeze
 
       def initialize(connection, users)
         @connection = connection
@@ -38,6 +44,21 @@ module PSN
       def shareable_link(online_id = nil)
         account_id = online_id ? @users.account_id(online_id) : own_account_id
         ShareableLink.from_api(@connection.get(:mobile, format(SHARE_PATH, account_id), {}))
+      end
+
+      # Profile for a Sony numeric account ID — friends lists and presence
+      # responses return bare IDs. Leaner shape than #find (internal mobile
+      # endpoint; rejects "me", so pass a real ID).
+      def find_by_account_id(account_id)
+        BasicProfile.from_api(@connection.get(:mobile, format(PROFILE_BY_ACCOUNT_PATH, account_id), {}))
+      end
+
+      # The authenticated account's identity + subscription states (PS+, EA Play,
+      # Ubisoft+...), from the web toolbar's "oracle" persisted query.
+      def account_summary
+        response = @connection.graphql(ORACLE_OPERATION, {}, ORACLE_HASH,
+                                       host: :web, headers: ORACLE_HEADERS)
+        AccountSummary.from_api(response.dig("data", "oracleUserProfileRetrieve") || {})
       end
 
       private
