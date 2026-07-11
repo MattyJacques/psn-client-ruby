@@ -8,10 +8,13 @@ module PSN
   #   client.games.played.first(10)
   #   client.trophies.summary("a_friend")
   #   client.store.entitlements.to_a
+  #
+  # language: is sent as Accept-Language on every request (display strings
+  # in some responses follow it).
   class Client
-    def initialize(npsso: nil, refresh_token: nil)
+    def initialize(npsso: nil, refresh_token: nil, language: Connection::DEFAULT_LANGUAGE)
       @auth = Auth.new(npsso: npsso, refresh_token: refresh_token)
-      @connection = Connection.new(@auth)
+      @connection = Connection.new(@auth, language: language)
     end
 
     def games = @games ||= Resources::Games.new(@connection, users)
