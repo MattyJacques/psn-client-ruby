@@ -11,9 +11,12 @@ module PSN
   #
   # language: is sent as Accept-Language on every request (display strings
   # in some responses follow it).
+  # on_token_refresh: is called with each new refresh token — persist it there
+  # instead of polling #refresh_token, since Connection can rotate the token
+  # mid-session when it recovers from a 401.
   class Client
-    def initialize(npsso: nil, refresh_token: nil, language: Connection::DEFAULT_LANGUAGE)
-      @auth = Auth.new(npsso: npsso, refresh_token: refresh_token)
+    def initialize(npsso: nil, refresh_token: nil, language: Connection::DEFAULT_LANGUAGE, on_token_refresh: nil)
+      @auth = Auth.new(npsso: npsso, refresh_token: refresh_token, on_token_refresh: on_token_refresh)
       @connection = Connection.new(@auth, language: language)
     end
 

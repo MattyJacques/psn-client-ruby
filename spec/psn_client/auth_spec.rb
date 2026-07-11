@@ -82,4 +82,58 @@ RSpec.describe PSN::Auth do
     auth = described_class.new(refresh_token: "bad")
     expect { auth.access_token }.to raise_error(PSN::AuthenticationError) { |e| expect(e.response[:status]).to eq(400) }
   end
+
+  describe "on_token_refresh" do
+    let(:json_headers) { { "Content-Type" => "application/json" } }
+
+    it "reports the refresh token gained from the initial NPSSO exchange" do
+      stub_authorize
+      stub_request(:post, token_url).to_return(status: 200, body: token_body, headers: json_headers)
+
+      events = []
+      auth = described_class.new(npsso: "NPSSO123", on_token_refresh: ->(token) { events << token })
+      auth.access_token
+      expect(events).to eq(["RT-1"])
+    end
+
+    it "reports each rotation exactly once" do
+      stub_request(:post, token_url).to_return(
+        { status: 200, body: token_body(access: "AT-1", refresh: "RT-1", expires_in: 0), headers: json_headers },
+        { status: 200, body: token_body(access: "AT-2", refresh: "RT-2"), headers: json_headers }
+      )
+
+      events = []
+      auth = described_class.new(refresh_token: "RT-0", on_token_refresh: ->(token) { events << token })
+      2.times { auth.access_token }
+      expect(events).to eq(%w[RT-1 RT-2])
+    end
+
+    it "stays quiet when the server echoes the same refresh token" do
+      stub_request(:post, token_url)
+        .to_return(status: 200, body: token_body(refresh: "RT-0"), headers: json_headers)
+
+      events = []
+      auth = described_class.new(refresh_token: "RT-0", on_token_refresh: ->(token) { events << token })
+      auth.access_token
+      expect(events).to be_empty
+    end
+
+    it "propagates callback exceptions" do
+      stub_request(:post, token_url).to_return(status: 200, body: token_body, headers: json_headers)
+
+      auth = described_class.new(refresh_token: "RT-0", on_token_refresh: ->(_t) { raise "disk full" })
+      expect { auth.access_token }.to raise_error(RuntimeError, "disk full")
+    end
+
+    it "runs the callback outside the auth lock so it can re-enter" do
+      stub_request(:post, token_url)
+        .to_return(status: 200, body: token_body(access: "AT-9", refresh: "RT-9"), headers: json_headers)
+
+      reentrant = nil
+      auth = described_class.new(refresh_token: "RT-0", on_token_refresh: ->(_t) { reentrant = auth.access_token })
+      expect(auth.access_token).to eq("AT-9")
+      expect(reentrant).to eq("AT-9")
+      expect(WebMock).to have_requested(:post, token_url).once
+    end
+  end
 end
