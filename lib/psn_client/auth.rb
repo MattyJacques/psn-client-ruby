@@ -53,6 +53,10 @@ module PSN
     # Runs the block inside the auth mutex, then — after releasing it —
     # reports a rotated refresh token. The callback runs outside the lock so
     # it can safely re-enter (e.g. persist the token, then make a request).
+    # Rotations are detected exactly once and in order under the mutex, but
+    # because delivery happens outside it, concurrent rotations may deliver
+    # out of order — the token argument, not #refresh_token, is the
+    # authoritative value for the event.
     def notifying_rotation
       rotated = nil
       result = @mutex.synchronize do
