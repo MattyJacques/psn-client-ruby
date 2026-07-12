@@ -1,0 +1,43 @@
+module PSN
+  class TrophyHelpInfo < ::Data
+    def self.from_api: (::Hash[String, untyped] hash) -> TrophyHelpInfo
+    def self.new: (**untyped) -> instance
+
+    attr_reader trophy_id: String?
+    attr_reader uds_object_id: String?
+    attr_reader help_type: String?
+    attr_reader raw: ::Hash[String, untyped]
+  end
+
+  class GameHelp < ::Data
+    def self.from_api: (::Hash[String, untyped] hash) -> GameHelp
+    def self.new: (**untyped) -> instance
+
+    attr_reader access: bool
+    attr_reader tips: ::Array[TrophyTip]
+    attr_reader raw: ::Hash[String, untyped]
+
+    def access?: () -> bool
+  end
+
+  class TrophyTip < ::Data
+    def self.from_api: (::Hash[String, untyped] hash) -> TrophyTip
+    def self.new: (**untyped) -> instance
+
+    attr_reader trophy_id: String?
+    attr_reader contents: ::Array[TipContent]
+    attr_reader raw: ::Hash[String, untyped]
+  end
+
+  class TipContent < ::Data
+    def self.from_api: (::Hash[String, untyped] hash) -> TipContent
+    def self.new: (**untyped) -> instance
+
+    attr_reader description: String?
+    attr_reader display_name: String?
+    attr_reader media_type: String?
+    attr_reader media_url: String?
+    attr_reader tip_id: String?
+    attr_reader raw: ::Hash[String, untyped]
+  end
+end

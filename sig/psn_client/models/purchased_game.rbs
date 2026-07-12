@@ -1,0 +1,23 @@
+module PSN
+  class PurchasedGame < ::Data
+    def self.from_api: (::Hash[String, untyped] hash) -> PurchasedGame
+    def self.new: (**untyped) -> instance
+
+    attr_reader name: String?
+    attr_reader title_id: String?
+    attr_reader platform: String?
+    attr_reader concept_id: String?
+    attr_reader entitlement_id: String?
+    attr_reader product_id: String?
+    attr_reader image_url: String?
+    attr_reader active: bool
+    attr_reader downloadable: bool
+    attr_reader pre_order: bool
+    attr_reader membership: String?
+    attr_reader raw: ::Hash[String, untyped]
+
+    def active?: () -> bool
+    def downloadable?: () -> bool
+    def pre_order?: () -> bool
+  end
+end

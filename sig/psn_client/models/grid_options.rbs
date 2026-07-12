@@ -1,0 +1,41 @@
+module PSN
+  class FacetValue < ::Data
+    def self.from_api: (::Hash[String, untyped] hash) -> FacetValue
+    def self.new: (**untyped) -> instance
+
+    attr_reader key: String?
+    attr_reader display_name: String?
+    attr_reader count: Integer?
+    attr_reader raw: ::Hash[String, untyped]
+  end
+
+  class Facet < ::Data
+    def self.from_api: (::Hash[String, untyped] hash) -> Facet
+    def self.new: (**untyped) -> instance
+
+    attr_reader name: String?
+    attr_reader display_name: String?
+    attr_reader values: ::Array[FacetValue]
+    attr_reader raw: ::Hash[String, untyped]
+  end
+
+  class SortOption < ::Data
+    def self.from_api: (::Hash[String, untyped] hash) -> SortOption
+    def self.new: (**untyped) -> instance
+
+    attr_reader name: String?
+    attr_reader display_name: String?
+    attr_reader ascending: bool?
+    attr_reader raw: ::Hash[String, untyped]
+  end
+
+  class GridOptions < ::Data
+    def self.from_api: (::Hash[String, untyped] hash) -> GridOptions
+    def self.new: (**untyped) -> instance
+
+    attr_reader facets: ::Array[Facet]
+    attr_reader sorting_options: ::Array[SortOption]
+    attr_reader total_count: Integer?
+    attr_reader raw: ::Hash[String, untyped]
+  end
+end

@@ -1,0 +1,12 @@
+module PSN
+  class TrophySummary < ::Data
+    def self.from_api: (::Hash[String, untyped] hash) -> TrophySummary
+    def self.new: (**untyped) -> instance
+
+    attr_reader level: Integer?
+    attr_reader progress: Integer?
+    attr_reader tier: Integer?
+    attr_reader earned_counts: ::Hash[Symbol, Integer]?
+    attr_reader raw: ::Hash[String, untyped]
+  end
+end

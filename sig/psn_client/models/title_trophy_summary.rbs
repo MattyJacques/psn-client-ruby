@@ -1,0 +1,10 @@
+module PSN
+  class TitleTrophySummary < ::Data
+    def self.from_api: (::Hash[String, untyped] hash) -> TitleTrophySummary
+    def self.new: (**untyped) -> instance
+
+    attr_reader np_title_id: String?
+    attr_reader trophy_titles: ::Array[TrophyTitle]
+    attr_reader raw: ::Hash[String, untyped]
+  end
+end

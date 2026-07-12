@@ -1,0 +1,13 @@
+module PSN
+  class ConceptInfo < ::Data
+    def self.from_api: (::Hash[String, untyped] hash) -> ConceptInfo
+    def self.new: (**untyped) -> instance
+
+    attr_reader short_description: String?
+    attr_reader long_description: String?
+    attr_reader genres: ::Array[untyped]
+    attr_reader publisher_name: String?
+    attr_reader release_date: Time?
+    attr_reader raw: ::Hash[String, untyped]
+  end
+end

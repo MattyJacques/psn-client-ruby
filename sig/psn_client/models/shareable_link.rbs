@@ -1,0 +1,11 @@
+module PSN
+  class ShareableLink < ::Data
+    def self.from_api: (::Hash[String, untyped] hash) -> ShareableLink
+    def self.new: (**untyped) -> instance
+
+    attr_reader url: String?
+    attr_reader image_url: String?
+    attr_reader destination: String?
+    attr_reader raw: ::Hash[String, untyped]
+  end
+end

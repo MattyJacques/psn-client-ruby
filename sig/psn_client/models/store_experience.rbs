@@ -1,0 +1,21 @@
+module PSN
+  class NavItem < ::Data
+    def self.from_api: (::Hash[String, untyped] hash) -> NavItem
+    def self.new: (**untyped) -> instance
+
+    attr_reader id: String?
+    attr_reader name: String?
+    attr_reader type: String?
+    attr_reader view_collection_id: String?
+    attr_reader raw: ::Hash[String, untyped]
+  end
+
+  class StoreExperience < ::Data
+    def self.from_api: (::Hash[String, untyped] hash) -> StoreExperience
+    def self.new: (**untyped) -> instance
+
+    attr_reader id: String?
+    attr_reader nav_items: ::Array[NavItem]
+    attr_reader raw: ::Hash[String, untyped]
+  end
+end

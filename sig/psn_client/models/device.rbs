@@ -1,0 +1,12 @@
+module PSN
+  class Device < ::Data
+    def self.from_api: (::Hash[String, untyped] hash) -> Device
+    def self.new: (**untyped) -> instance
+
+    attr_reader device_id: String?
+    attr_reader device_type: String?
+    attr_reader activation_type: String?
+    attr_reader activated_at: Time?
+    attr_reader raw: ::Hash[String, untyped]
+  end
+end

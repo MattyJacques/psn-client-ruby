@@ -1,0 +1,15 @@
+module PSN
+  class TrophyTitle < ::Data
+    def self.from_api: (::Hash[String, untyped] hash) -> TrophyTitle
+    def self.new: (**untyped) -> instance
+
+    attr_reader name: String?
+    attr_reader np_communication_id: String?
+    attr_reader np_service_name: String?
+    attr_reader platform: String?
+    attr_reader progress: Integer?
+    attr_reader earned_counts: ::Hash[Symbol, Integer]?
+    attr_reader defined_counts: ::Hash[Symbol, Integer]?
+    attr_reader raw: ::Hash[String, untyped]
+  end
+end

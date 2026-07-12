@@ -1,0 +1,21 @@
+module PSN
+  class BasicProfile < ::Data
+    def self.from_api: (::Hash[String, untyped] hash) -> BasicProfile
+    def self.new: (**untyped) -> instance
+
+    attr_reader online_id: String?
+    attr_reader first_name: String?
+    attr_reader last_name: String?
+    attr_reader about_me: String?
+    attr_reader avatar_urls: ::Hash[untyped, untyped]
+    attr_reader languages: ::Array[untyped]
+    attr_reader plus: bool?
+    attr_reader officially_verified: bool?
+    attr_reader me: bool?
+    attr_reader raw: ::Hash[String, untyped]
+
+    def plus?: () -> bool?
+    def officially_verified?: () -> bool?
+    def me?: () -> bool?
+  end
+end

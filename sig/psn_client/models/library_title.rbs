@@ -1,0 +1,20 @@
+module PSN
+  class LibraryTitle < ::Data
+    def self.from_api: (::Hash[String, untyped] hash) -> LibraryTitle
+    def self.new: (**untyped) -> instance
+
+    attr_reader name: String?
+    attr_reader title_id: String?
+    attr_reader platform: String?
+    attr_reader concept_id: String?
+    attr_reader entitlement_id: String?
+    attr_reader product_id: String?
+    attr_reader image_url: String?
+    attr_reader last_played_at: Time?
+    attr_reader active: bool
+    attr_reader subscription_service: String?
+    attr_reader raw: ::Hash[String, untyped]
+
+    def active?: () -> bool
+  end
+end

@@ -1,0 +1,14 @@
+module PSN
+  class MediaItem < ::Data
+    def self.from_api: (::Hash[String, untyped] hash) -> MediaItem
+    def self.new: (**untyped) -> instance
+
+    attr_reader role: String?
+    attr_reader type: String?
+    attr_reader url: String?
+    attr_reader raw: ::Hash[String, untyped]
+
+    def image?: () -> bool
+    def video?: () -> bool
+  end
+end

@@ -1,0 +1,12 @@
+module PSN
+  class StarRating < ::Data
+    def self.from_api: (::Hash[String, untyped] hash) -> StarRating
+    def self.new: (**untyped) -> instance
+
+    attr_reader average: Integer?
+    attr_reader average_display: String?
+    attr_reader total: Integer?
+    attr_reader distribution: ::Hash[untyped, untyped]
+    attr_reader raw: ::Hash[String, untyped]
+  end
+end

@@ -1,0 +1,15 @@
+module PSN
+  class Entitlement < ::Data
+    def self.from_api: (::Hash[String, untyped] hash) -> Entitlement
+    def self.new: (**untyped) -> instance
+
+    attr_reader id: String?
+    attr_reader name: String?
+    attr_reader type: String?
+    attr_reader platform: String?
+    attr_reader product_id: String?
+    attr_reader title_id: String?
+    attr_reader acquired_at: Time?
+    attr_reader raw: ::Hash[String, untyped]
+  end
+end

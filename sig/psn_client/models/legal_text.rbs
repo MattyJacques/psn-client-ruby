@@ -1,0 +1,11 @@
+module PSN
+  class LegalText < ::Data
+    def self.from_api: (::Hash[String, untyped] hash) -> LegalText
+    def self.new: (**untyped) -> instance
+
+    attr_reader notices: ::Array[untyped]
+    attr_reader privacy_policy: String?
+    attr_reader publisher: String?
+    attr_reader raw: ::Hash[String, untyped]
+  end
+end

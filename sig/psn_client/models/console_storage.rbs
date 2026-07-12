@@ -1,0 +1,15 @@
+module PSN
+  class ConsoleStorage < ::Data
+    def self.from_api: (::Hash[String, untyped] hash) -> ConsoleStorage
+    def self.new: (**untyped) -> instance
+
+    attr_reader name: String?
+    attr_reader platform: String?
+    attr_reader duid: String?
+    attr_reader free_bytes: Integer?
+    attr_reader total_bytes: Integer?
+    attr_reader updated_at: Time?
+    attr_reader installed_titles: ::Array[InstalledTitle]
+    attr_reader raw: ::Hash[String, untyped]
+  end
+end

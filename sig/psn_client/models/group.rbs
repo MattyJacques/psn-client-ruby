@@ -1,0 +1,27 @@
+module PSN
+  class GroupMember < ::Data
+    def self.from_api: (::Hash[String, untyped] hash) -> GroupMember
+    def self.new: (**untyped) -> instance
+
+    attr_reader account_id: String?
+    attr_reader online_id: String?
+    attr_reader role: String?
+  end
+
+  class Group < ::Data
+    def self.from_api: (::Hash[String, untyped] hash) -> Group
+    def self.new: (**untyped) -> instance
+    def self.presence_of: (String? value) -> String?
+
+    attr_reader id: String?
+    attr_reader name: String?
+    attr_reader group_type: String?
+    attr_reader favorite: bool
+    attr_reader modified_at: Time?
+    attr_reader members: ::Array[GroupMember]
+    attr_reader latest_message: GroupMessage?
+    attr_reader raw: ::Hash[String, untyped]
+
+    def favorite?: () -> bool
+  end
+end

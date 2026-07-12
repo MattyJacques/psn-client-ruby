@@ -1,0 +1,28 @@
+module PSN
+  class PresenceTitle < ::Data
+    def self.from_api: (::Hash[String, untyped] hash) -> PresenceTitle
+    def self.new: (**untyped) -> instance
+
+    attr_reader np_title_id: String?
+    attr_reader name: String?
+    attr_reader format: String?
+    attr_reader launch_platform: String?
+    attr_reader icon_url: String?
+    attr_reader raw: ::Hash[String, untyped]
+  end
+
+  class Presence < ::Data
+    def self.from_api: (::Hash[String, untyped] hash) -> Presence
+    def self.new: (**untyped) -> instance
+
+    attr_reader availability: String?
+    attr_reader online: bool
+    attr_reader platform: String?
+    attr_reader last_online_at: Time?
+    attr_reader now_playing: ::Array[PresenceTitle]
+    attr_reader raw: ::Hash[String, untyped]
+
+    def online?: () -> bool
+    def available?: () -> bool
+  end
+end
