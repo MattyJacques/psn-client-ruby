@@ -1,0 +1,17 @@
+module PSN
+  module Resources
+    class Store
+      ENTITLEMENTS_PATH: String
+      ENTITLEMENTS_PARAMS: ::Hash[String, String]
+      PAGE_SIZE: Integer
+      WISHLIST_OPERATION: String
+      WISHLIST_HASH: String
+      TRANSACTIONS_ERROR: String
+
+      def initialize: (Connection connection) -> void
+      def transactions: () -> bot
+      def entitlements: (?title_ids: untyped) -> Collection
+      def wishlist: () -> Enumerator::Lazy[WishlistItem, untyped]
+    end
+  end
+end

@@ -1,0 +1,19 @@
+module PSN
+  module Resources
+    class Groups
+      HEADERS: ::Hash[String, String]
+      GROUPS_PATH: String
+      GROUP_PATH: String
+      MESSAGES_PATH: String
+      GROUP_FIELDS: String
+      PAGE_SIZE: Integer
+      MESSAGES_PAGE_SIZE: Integer
+      CURSOR_PARAM: String
+
+      def initialize: (Connection connection) -> void
+      def all: () -> Collection
+      def find: (String group_id) -> Group
+      def messages: (String group_id) -> Collection
+    end
+  end
+end

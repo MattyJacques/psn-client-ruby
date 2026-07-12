@@ -1,0 +1,23 @@
+module PSN
+  class PlusOffer < ::Data
+    def self.from_api: (::Hash[String, untyped] hash) -> PlusOffer
+    def self.new: (**untyped) -> instance
+
+    attr_reader title: String?
+    attr_reader duration: String?
+    attr_reader description: String?
+    attr_reader sku_id: String?
+    attr_reader cta_label: String?
+    attr_reader trial: bool
+    attr_reader active_subscription: bool
+    attr_reader base_price: String?
+    attr_reader base_price_value: Integer?
+    attr_reader discounted_price: String?
+    attr_reader discounted_value: Integer?
+    attr_reader currency_code: String?
+    attr_reader raw: ::Hash[String, untyped]
+
+    def trial?: () -> bool
+    def active_subscription?: () -> bool
+  end
+end

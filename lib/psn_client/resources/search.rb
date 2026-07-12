@@ -19,20 +19,18 @@ module PSN
       USERS_DOMAIN_HASH = "23ece284bf8bdc50bfa30a4d97fd4d733e723beb7a42dff8c1ee883f8461a2e1"
       GAME_DOMAINS = { full_games: "MobileGames", add_ons: "MobileAddOns" }.freeze
       USERS_DOMAIN = "SocialAllAccounts"
-      LOCALE = "en-US"
       PAGE_SIZE = 20
       # The PlayStation App identifies itself on search requests.
       HEADERS = { "apollographql-client-name" => "PlayStationApp-Android" }.freeze
-      # Per-context bundle of the persisted-query hashes, context name and
-      # extra domain-query variables, so result_items only threads one
-      # keyword through. The games domain query rejects displayTitleLocale
-      # while the users one requires it (mirrors the app's persisted
-      # documents) — hence per-context domain_extras.
+      # Per-context bundle of the persisted-query hashes and context name, so
+      # result_items only threads one keyword through. The games domain query
+      # rejects displayTitleLocale while the users one requires it (mirrors
+      # the app's persisted documents) — hence locale_in_domain. The locale
+      # itself comes from Connection#language.
       GAMES_QUERIES = { context: GAMES_CONTEXT, context_hash: GAMES_CONTEXT_HASH,
-                        domain_hash: GAMES_DOMAIN_HASH, domain_extras: {}.freeze }.freeze
+                        domain_hash: GAMES_DOMAIN_HASH, locale_in_domain: false }.freeze
       USERS_QUERIES = { context: USERS_CONTEXT, context_hash: USERS_CONTEXT_HASH,
-                        domain_hash: USERS_DOMAIN_HASH,
-                        domain_extras: { "displayTitleLocale" => LOCALE }.freeze }.freeze
+                        domain_hash: USERS_DOMAIN_HASH, locale_in_domain: true }.freeze
 
       def initialize(connection)
         @connection = connection
@@ -66,7 +64,7 @@ module PSN
 
       def context_page(term, domain, queries)
         variables = { "searchTerm" => term, "searchContext" => queries.fetch(:context),
-                      "displayTitleLocale" => LOCALE }
+                      "displayTitleLocale" => @connection.language }
         response = @connection.graphql(CONTEXT_OPERATION, variables, queries.fetch(:context_hash), headers: HEADERS)
         results = response.dig("data", "universalContextSearch", "results") || []
         page = results.find { |r| r["domain"] == domain } || {}
@@ -76,7 +74,8 @@ module PSN
       def domain_page(term, domain, queries, cursor, offset)
         variables = { "searchTerm" => term, "searchDomain" => domain,
                       "pageSize" => PAGE_SIZE, "pageOffset" => offset,
-                      "nextCursor" => cursor }.merge(queries.fetch(:domain_extras))
+                      "nextCursor" => cursor }
+        variables["displayTitleLocale"] = @connection.language if queries.fetch(:locale_in_domain)
         response = @connection.graphql(DOMAIN_OPERATION, variables, queries.fetch(:domain_hash), headers: HEADERS)
         page = response.dig("data", "universalDomainSearch") || {}
         [page["searchResults"] || [], page["next"]]

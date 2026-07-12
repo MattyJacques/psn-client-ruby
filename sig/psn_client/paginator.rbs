@@ -1,0 +1,6 @@
+module PSN
+  module Paginator
+    def self?.offset: (page_size: Integer) { (Integer, Integer) -> [::Array[untyped], untyped] } -> Collection
+    def self?.cursor: () { (untyped, Integer) -> [::Array[untyped], untyped] } -> Collection
+  end
+end

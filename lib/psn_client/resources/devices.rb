@@ -11,8 +11,8 @@ module PSN
                          "platform" => "PS5,PS4,PS3,PSVita" }.freeze
       STORAGE_PATH = "/api/cloudAssistedNavigation/v2/users/me/clients"
       # The storage endpoint documents an Accept-Language header (andshrew's
-      # Console.md); the locale only affects display strings.
-      STORAGE_HEADERS = { "Accept-Language" => "en-us" }.freeze
+      # Console.md); the locale only affects display strings. Connection sends
+      # it globally, so no per-request header is needed here.
 
       def initialize(connection)
         @connection = connection
@@ -30,7 +30,7 @@ module PSN
       # (verified live 2026-07-10).
       def storage(platform: "PS5")
         params = { "includeFields" => "device,systemData", "platform" => platform }
-        response = @connection.get(:mobile, STORAGE_PATH, params, headers: STORAGE_HEADERS)
+        response = @connection.get(:mobile, STORAGE_PATH, params)
         (response["clients"] || []).map { |client| ConsoleStorage.from_api(client) }
       end
     end

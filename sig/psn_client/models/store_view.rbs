@@ -1,0 +1,39 @@
+module PSN
+  class StoreLink < ::Data
+    def self.from_api: (::Hash[String, untyped] hash) -> StoreLink
+    def self.new: (**untyped) -> instance
+
+    attr_reader target: String?
+    attr_reader type: String?
+    attr_reader localized_name: String?
+    attr_reader raw: ::Hash[String, untyped]
+  end
+
+  class StoreComponent < ::Data
+    def self.from_api: (::Hash[String, untyped] hash) -> StoreComponent
+    def self.new: (**untyped) -> instance
+
+    attr_reader id: String?
+    attr_reader component_type: String?
+    attr_reader name: String?
+    attr_reader text: String?
+    attr_reader image_url: String?
+    attr_reader ordinal: Integer?
+    attr_reader category_id: String?
+    attr_reader facet_list: untyped
+    attr_reader sort_order_list: untyped
+    attr_reader link: StoreLink?
+    attr_reader raw: ::Hash[String, untyped]
+  end
+
+  class StoreView < ::Data
+    def self.from_api: (::Hash[String, untyped] hash) -> StoreView
+    def self.new: (**untyped) -> instance
+
+    attr_reader id: String?
+    attr_reader type: String?
+    attr_reader purpose: String?
+    attr_reader components: ::Array[StoreComponent]
+    attr_reader raw: ::Hash[String, untyped]
+  end
+end

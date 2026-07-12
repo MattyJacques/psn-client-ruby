@@ -1,0 +1,32 @@
+module PSN
+  module Resources
+    class Browse
+      HEADERS: ::Hash[String, String]
+      EXPERIENCE_OPERATION: String
+      EXPERIENCE_HASH: String
+      EMS_CLIENT_ID: String
+      VIEWS_OPERATION: String
+      VIEWS_HASH: String
+      DEFAULT_VIEW_OPERATION: String
+      DEFAULT_VIEW_HASH: String
+      GRID_OPERATION: String
+      GRID_HASH: String
+      STRANDS_OPERATION: String
+      STRANDS_HASH: String
+      PAGE_SIZE: Integer
+
+      def initialize: (Connection connection) -> void
+      def experience: (?client_id: String) -> StoreExperience
+      def views: (String | ::Array[String] view_ids, experience_id: String) -> ::Array[StoreView]
+      def default_view: (String category_id, localized_key_id: String, experience_id: String) -> ::Array[StoreView]
+      def grid: (String category_id) -> Collection
+      def facets: (String category_id) -> GridOptions
+      def strand: (String strand_id, ?size: Integer) -> ::Array[CatalogItem]
+
+      private
+
+      def graphql: (String operation, ::Hash[String, untyped] variables, String hash) -> untyped
+      def grid_page: (String category_id, Integer size, Integer offset) -> ::Hash[String, untyped]
+    end
+  end
+end

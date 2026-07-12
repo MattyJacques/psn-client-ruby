@@ -1,0 +1,15 @@
+module PSN
+  class GroupMessage < ::Data
+    def self.from_api: (::Hash[String, untyped] hash) -> GroupMessage
+    def self.new: (**untyped) -> instance
+
+    attr_reader uid: String?
+    attr_reader type: Integer?
+    attr_reader type_name: Symbol?
+    attr_reader body: String?
+    attr_reader created_at: Time?
+    attr_reader sender_account_id: String?
+    attr_reader sender_online_id: String?
+    attr_reader raw: ::Hash[String, untyped]
+  end
+end

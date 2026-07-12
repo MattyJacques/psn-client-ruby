@@ -1,0 +1,17 @@
+module PSN
+  class User < ::Data
+    def self.from_api: (::Hash[String, untyped] hash) -> User
+    def self.new: (**untyped) -> instance
+
+    attr_reader online_id: String?
+    attr_reader account_id: String?
+    attr_reader display_name: String?
+    attr_reader avatar_url: String?
+    attr_reader ps_plus: bool
+    attr_reader verified: bool
+    attr_reader raw: ::Hash[String, untyped]
+
+    def ps_plus?: () -> bool
+    def verified?: () -> bool
+  end
+end

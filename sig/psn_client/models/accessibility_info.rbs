@@ -1,0 +1,10 @@
+module PSN
+  class AccessibilityInfo < ::Data
+    def self.from_api: (::Hash[String, untyped] hash) -> AccessibilityInfo
+    def self.new: (**untyped) -> instance
+
+    attr_reader notices_by_platform: untyped
+    attr_reader platforms: ::Array[untyped]
+    attr_reader raw: ::Hash[String, untyped]
+  end
+end

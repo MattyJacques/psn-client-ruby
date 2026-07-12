@@ -1,0 +1,14 @@
+module PSN
+  class Edition < ::Data
+    def self.from_api: (::Hash[String, untyped] hash) -> Edition
+    def self.new: (**untyped) -> instance
+
+    attr_reader name: String?
+    attr_reader id: String?
+    attr_reader np_title_id: String?
+    attr_reader invariant_name: String?
+    attr_reader cta_type: String?
+    attr_reader price: Price?
+    attr_reader raw: ::Hash[String, untyped]
+  end
+end

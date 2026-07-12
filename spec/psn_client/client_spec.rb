@@ -61,4 +61,16 @@ RSpec.describe PSN::Client do
     expect(games.first.name).to eq("ASTRO's PLAYROOM")
     expect(client.refresh_token).to eq("RT-1")
   end
+
+  it "sends the configured language on API requests" do
+    stub_oauth
+    stub_request(:get, "https://m.np.playstation.com/api/gamelist/v2/users/me/titles")
+      .with(query: { "limit" => "200", "offset" => "0" },
+            headers: { "Accept-Language" => "en-GB" })
+      .to_return(status: 200, body: { titles: [], totalItemCount: 0 }.to_json,
+                 headers: { "Content-Type" => "application/json" })
+
+    client = described_class.new(refresh_token: "RT-0", language: "en-GB")
+    expect(client.games.played.to_a).to eq([])
+  end
 end

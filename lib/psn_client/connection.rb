@@ -5,8 +5,9 @@ require "faraday/retry"
 require "json"
 
 module PSN
-  # Shared HTTP layer: one Faraday connection per PSN host, Bearer auth
-  # injected per-request, transient-failure retries, and error mapping.
+  # Shared HTTP layer: one Faraday connection per PSN host, Bearer auth and
+  # Accept-Language injected per-request, transient-failure retries, and
+  # error mapping.
   class Connection
     HOSTS = {
       mobile: "https://m.np.playstation.com",
@@ -26,9 +27,14 @@ module PSN
     GRAPHQL_PATH = "/api/graphql/v1/op"
     GRAPHQL_HEADERS = { "Apollo-Require-Preflight" => "true" }.freeze
 
-    def initialize(auth, retry_options: nil)
+    DEFAULT_LANGUAGE = "en-US"
+
+    attr_reader :language
+
+    def initialize(auth, retry_options: nil, language: DEFAULT_LANGUAGE)
       @auth = auth
       @retry_options = DEFAULT_RETRY_OPTIONS.merge(retry_options || {})
+      @language = language
       @conns = {}
     end
 
@@ -69,6 +75,7 @@ module PSN
     def perform(host, verb, path, payload, headers)
       connection(host).public_send(verb, path) do |req|
         req.headers["Authorization"] = "Bearer #{@auth.access_token}"
+        req.headers["Accept-Language"] = @language
         headers.each { |name, value| req.headers[name] = value }
         verb == :get ? req.params.update(payload) : req.body = payload
       end

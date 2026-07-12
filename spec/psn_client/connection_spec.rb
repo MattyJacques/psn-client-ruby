@@ -95,6 +95,33 @@ RSpec.describe PSN::Connection do
       .to raise_error(PSN::APIError) { |e| expect(e.response[:status]).to eq(500) }
   end
 
+  it "sends Accept-Language with the default language on every request" do
+    stub_request(:get, url)
+      .with(headers: { "Authorization" => "Bearer tok-1", "Accept-Language" => "en-US" })
+      .to_return(json_response({ "ok" => true }))
+
+    expect(connection.get(:mobile, "/api/test")).to eq("ok" => true)
+  end
+
+  it "sends and exposes a custom language" do
+    custom = described_class.new(auth, retry_options: { max: 0 }, language: "en-GB")
+    stub_request(:get, url)
+      .with(headers: { "Accept-Language" => "en-GB" })
+      .to_return(json_response({ "ok" => true }))
+
+    expect(custom.get(:mobile, "/api/test")).to eq("ok" => true)
+    expect(custom.language).to eq("en-GB")
+  end
+
+  it "lets a per-request header override the global language" do
+    stub_request(:get, url)
+      .with(headers: { "Accept-Language" => "de-DE" })
+      .to_return(json_response({ "ok" => true }))
+
+    expect(connection.get(:mobile, "/api/test", {}, headers: { "Accept-Language" => "de-DE" }))
+      .to eq("ok" => true)
+  end
+
   describe "#graphql" do
     let(:gql_url) { "https://m.np.playstation.com/api/graphql/v1/op" }
 

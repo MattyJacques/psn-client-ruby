@@ -1,0 +1,12 @@
+module PSN
+  class TitleConcept < ::Data
+    def self.from_api: (::Hash[String, untyped] hash) -> TitleConcept
+    def self.new: (**untyped) -> instance
+
+    attr_reader id: String?
+    attr_reader name: String?
+    attr_reader title_ids: ::Array[untyped]
+    attr_reader type: String?
+    attr_reader raw: ::Hash[String, untyped]
+  end
+end

@@ -39,11 +39,10 @@ RSpec.describe PSN::Resources::Devices do
   end
 
   describe "#storage" do
-    it "maps consoles to ConsoleStorage models with the language header" do
+    it "maps consoles to ConsoleStorage models" do
       allow(connection).to receive(:get)
         .with(:mobile, "/api/cloudAssistedNavigation/v2/users/me/clients",
-              { "includeFields" => "device,systemData", "platform" => "PS5" },
-              headers: { "Accept-Language" => "en-us" })
+              { "includeFields" => "device,systemData", "platform" => "PS5" })
         .and_return(fixture("console_storage"))
 
       console = devices.storage.first
@@ -88,8 +87,7 @@ RSpec.describe PSN::Resources::Devices do
     it "passes a custom platform through and returns an empty array without clients" do
       allow(connection).to receive(:get)
         .with(:mobile, "/api/cloudAssistedNavigation/v2/users/me/clients",
-              { "includeFields" => "device,systemData", "platform" => "PS4" },
-              headers: { "Accept-Language" => "en-us" })
+              { "includeFields" => "device,systemData", "platform" => "PS4" })
         .and_return({})
 
       expect(devices.storage(platform: "PS4")).to eq([])

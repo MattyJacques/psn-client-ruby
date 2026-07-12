@@ -1,0 +1,13 @@
+module PSN
+  module Resources
+    class Media
+      LIST_PATH: String
+      URL_PATH: String
+      PAGE_SIZE: Integer
+
+      def initialize: (Connection connection) -> void
+      def captures: () -> Collection
+      def download_url: (String ugc_id) -> untyped
+    end
+  end
+end

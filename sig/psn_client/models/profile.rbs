@@ -1,0 +1,24 @@
+module PSN
+  class Profile < ::Data
+    def self.from_api: (::Hash[String, untyped] hash) -> Profile
+    def self.new: (**untyped) -> instance
+
+    attr_reader online_id: String?
+    attr_reader account_id: String?
+    attr_reader avatar_url: String?
+    attr_reader plus: bool
+    attr_reader about_me: String?
+    attr_reader languages: ::Array[untyped]?
+    attr_reader verified: bool
+    attr_reader trophy_summary: TrophySummary?
+    attr_reader online: bool
+    attr_reader platform: String?
+    attr_reader last_online_at: Time?
+    attr_reader raw: ::Hash[String, untyped]
+
+    def plus?: () -> bool
+    def verified?: () -> bool
+    def online?: () -> bool
+    def region: () -> String?
+  end
+end

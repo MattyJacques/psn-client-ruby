@@ -18,9 +18,9 @@ RSpec.describe PSN::Paginator do
       expect(calls).to eq(1)
     end
 
-    it "returns a lazy enumerator and stops on an empty page" do
+    it "returns a lazily-evaluated Collection and stops on an empty page" do
       enum = described_class.offset(page_size: 2) { |_l, _o| [[], 10] }
-      expect(enum).to be_a(Enumerator::Lazy)
+      expect(enum).to be_a(PSN::Collection)
       expect(enum.to_a).to eq([])
     end
 

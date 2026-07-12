@@ -1,0 +1,14 @@
+module PSN
+  class FriendshipSummary < ::Data
+    def self.from_api: (::Hash[String, untyped] hash) -> FriendshipSummary
+    def self.new: (**untyped) -> instance
+
+    attr_reader friend_relation: String?
+    attr_reader personal_detail_sharing: String?
+    attr_reader friends_count: Integer?
+    attr_reader mutual_friends_count: Integer?
+    attr_reader raw: ::Hash[String, untyped]
+
+    def friend?: () -> bool
+  end
+end

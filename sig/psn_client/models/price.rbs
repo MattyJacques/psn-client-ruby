@@ -1,0 +1,25 @@
+module PSN
+  class Price < ::Data
+    def self.from_api: (::Hash[String, untyped] hash) -> Price
+    def self.new: (**untyped) -> instance
+
+    attr_reader base_price: String?
+    attr_reader base_price_value: Integer?
+    attr_reader discounted_price: String?
+    attr_reader discounted_value: Integer?
+    attr_reader discount_text: String?
+    attr_reader currency_code: String?
+    attr_reader end_time: Time?
+    attr_reader free: bool
+    attr_reader tied_to_subscription: bool
+    attr_reader exclusive: bool
+    attr_reader service_branding: String?
+    attr_reader sku_id: String?
+    attr_reader raw: ::Hash[String, untyped]
+
+    def free?: () -> bool
+    def tied_to_subscription?: () -> bool
+    def exclusive?: () -> bool
+    def discounted?: () -> bool
+  end
+end

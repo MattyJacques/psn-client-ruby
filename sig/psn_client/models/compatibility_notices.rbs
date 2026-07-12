@@ -1,0 +1,10 @@
+module PSN
+  class CompatibilityNotices < ::Data
+    def self.from_api: (::Hash[String, untyped] hash) -> CompatibilityNotices
+    def self.new: (**untyped) -> instance
+
+    attr_reader compatibility: ::Array[untyped]
+    attr_reader accessibility: ::Array[untyped]
+    attr_reader raw: ::Hash[String, untyped]
+  end
+end

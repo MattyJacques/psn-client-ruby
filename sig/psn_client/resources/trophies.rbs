@@ -1,0 +1,42 @@
+module PSN
+  module Resources
+    class Trophies
+      TITLES_PATH: String
+      SUMMARY_PATH: String
+      DEFINITIONS_PATH: String
+      EARNED_PATH: String
+      PAGE_SIZE: Integer
+      TITLE_SUMMARY_PATH: String
+      TITLE_IDS_PER_REQUEST: Integer
+      GROUPS_DEFINITIONS_PATH: String
+      GROUPS_EARNED_PATH: String
+      GAME_HELP_HEADERS: ::Hash[String, String]
+      HELP_AVAILABILITY_OPERATION: String
+      HELP_AVAILABILITY_HASH: String
+      TIPS_OPERATION: String
+      TIPS_HASH: String
+
+      def initialize: (Connection connection, Users users) -> void
+      def titles: (?String? online_id) -> Collection
+      def summary: (?String? online_id) -> TrophySummary
+      # untyped return: real behavior stays lazy (title_ids.each_slice(...).lazy.flat_map { ... },
+      # see lib), but the bundled RBS core's Enumerator::Lazy only overrides #compact — #flat_map
+      # falls back to Enumerable's eager `-> Array[U]` signature, so declaring this Lazy here would
+      # be a false steep failure against accurately-typed title_ids.
+      def title_summary: (?String? online_id, title_ids: ::Array[String]) -> untyped
+      def earned: (?String? online_id, np_communication_id: String, ?platform: String?) -> Enumerator::Lazy[Trophy, untyped]
+      def groups: (?String? online_id, np_communication_id: String, ?platform: String?) -> Enumerator::Lazy[TrophyGroup, untyped]
+      def definitions: (np_communication_id: String, ?platform: String?) -> Enumerator::Lazy[Trophy, untyped]
+      def group_definitions: (np_communication_id: String, ?platform: String?) -> Enumerator::Lazy[TrophyGroup, untyped]
+      def game_help_availability: (np_communication_id: String, ?trophy_ids: ::Array[untyped]?) -> Enumerator::Lazy[TrophyHelpInfo, untyped]
+      def game_help: (np_communication_id: String, trophies: ::Array[untyped]) -> GameHelp
+
+      private
+
+      def service_params: (String? platform) -> ::Hash[String, String]
+      def help_request: (untyped trophy) -> ::Hash[String, untyped]
+      def merge: (::Array[untyped] definitions, ::Array[untyped] earned) -> ::Array[Trophy]
+      def merge_groups: (::Array[untyped] definitions, ::Array[untyped] earned) -> ::Array[TrophyGroup]
+    end
+  end
+end

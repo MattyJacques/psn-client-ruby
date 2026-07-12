@@ -1,0 +1,13 @@
+module PSN
+  class ContentRating < ::Data
+    def self.from_api: (::Hash[String, untyped] hash) -> ContentRating
+    def self.new: (**untyped) -> instance
+
+    attr_reader authority: String?
+    attr_reader name: String?
+    attr_reader description: String?
+    attr_reader url: String?
+    attr_reader descriptors: ::Array[untyped]
+    attr_reader raw: ::Hash[String, untyped]
+  end
+end

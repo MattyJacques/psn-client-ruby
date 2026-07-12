@@ -1,0 +1,77 @@
+module PSN
+  module Resources
+    class Catalog
+      HOST: Symbol
+      PRODUCT_OPERATION: String
+      PRODUCT_HASH: String
+      CONCEPT_OPERATION: String
+      CONCEPT_HASH: String
+      PRICING_OPERATION: String
+      PRICING_HASH: String
+      PRODUCT_RATING_OPERATION: String
+      PRODUCT_RATING_HASH: String
+      CONCEPT_RATING_OPERATION: String
+      CONCEPT_RATING_HASH: String
+      ADD_ONS_OPERATION: String
+      ADD_ONS_HASH: String
+      CATEGORY_OPERATION: String
+      CATEGORY_HASH: String
+      CONTENT_RATING_OPERATION: String
+      CONTENT_RATING_HASH: String
+      MEDIA_OPERATION: String
+      MEDIA_HASH: String
+      COMPATIBILITY_OPERATION: String
+      COMPATIBILITY_HASH: String
+      LEGAL_OPERATION: String
+      LEGAL_HASH: String
+      EDITIONS_OPERATION: String
+      EDITIONS_HASH: String
+      GAME_INFO_OPERATION: String
+      GAME_INFO_HASH: String
+      ACCESSIBILITY_OPERATION: String
+      ACCESSIBILITY_HASH: String
+      MEDIA_CAROUSEL_OPERATION: String
+      MEDIA_CAROUSEL_HASH: String
+      UPSELL_OPERATION: String
+      UPSELL_HASH: String
+      CONCEPT_BY_PRODUCT_OPERATION: String
+      CONCEPT_BY_PRODUCT_HASH: String
+      CONCEPT_ADD_ONS_OPERATION: String
+      CONCEPT_ADD_ONS_HASH: String
+      PLUS_OFFERS_OPERATION: String
+      PLUS_OFFERS_HASH: String
+      PLUS_TIERS: ::Hash[Symbol, String]
+      CATEGORIES: ::Hash[Symbol, String]
+      PAGE_SIZE: Integer
+      TITLE_CONCEPT_PATH: String
+
+      def initialize: (Connection connection) -> void
+      def product: (String product_id) -> StoreProduct
+      def concept: (untyped concept_id) -> StoreConcept
+      def pricing: (untyped concept_id) -> Price?
+      def product_rating: (String product_id) -> StarRating?
+      def concept_rating: (untyped concept_id) -> StarRating?
+      def content_rating: (untyped concept_id) -> ContentRating?
+      def media: (untyped concept_id) -> ::Array[MediaItem]
+      def compatibility_notices: (untyped concept_id) -> CompatibilityNotices
+      def legal_text: (untyped concept_id) -> LegalText
+      def editions: (untyped concept_id) -> ::Array[Edition]
+      def game_info: (untyped concept_id) -> ConceptInfo
+      def accessibility: (untyped concept_id) -> AccessibilityInfo
+      def media_carousel: (untyped concept_id) -> ::Array[MediaItem]
+      def upsell: (untyped concept_id) -> ::Array[Edition]
+      def concept_for_product: (String product_id) -> StoreConcept
+      def concept_for_title: (String np_title_id) -> ::Array[TitleConcept]
+      def add_ons_by_concept: (untyped concept_id) -> Collection
+      def plus_offers: (?Symbol tier) -> ::Array[PlusOffer]
+      def add_ons: (String np_title_id) -> Collection
+      def category: (Symbol | String id, ?sort: String, ?ascending: bool) -> Collection
+
+      private
+
+      def graphql: (String operation, ::Hash[String, untyped] variables, String hash) -> untyped
+      def category_variables: (String category_id, Integer size, Integer offset, String sort,
+                               bool ascending) -> ::Hash[String, untyped]
+    end
+  end
+end

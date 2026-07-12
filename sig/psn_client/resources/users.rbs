@@ -1,0 +1,14 @@
+module PSN
+  module Resources
+    class Users
+      SEARCH_PATH: String
+
+      def initialize: (Connection connection) -> void
+      def account_id: (String? online_id) -> String
+
+      private
+
+      def lookup: (String online_id) -> String
+    end
+  end
+end

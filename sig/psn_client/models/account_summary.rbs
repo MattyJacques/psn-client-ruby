@@ -1,0 +1,34 @@
+module PSN
+  class Subscription < ::Data
+    def self.from_api: (::Hash[String, untyped] hash) -> Subscription
+    def self.new: (**untyped) -> instance
+
+    attr_reader type: String?
+    attr_reader status: String?
+    attr_reader tier: String?
+    attr_reader duration: String?
+    attr_reader loyalty_tier: String?
+    attr_reader raw: ::Hash[String, untyped]
+
+    def active?: () -> bool
+  end
+
+  class AccountSummary < ::Data
+    def self.from_api: (::Hash[String, untyped] hash) -> AccountSummary
+    def self.new: (**untyped) -> instance
+
+    attr_reader account_id: String?
+    attr_reader online_id: String?
+    attr_reader name: String?
+    attr_reader age: Integer?
+    attr_reader avatar_url: String?
+    attr_reader ps_plus: bool?
+    attr_reader officially_verified: bool?
+    attr_reader locale: String?
+    attr_reader subscriptions: ::Array[Subscription]
+    attr_reader raw: ::Hash[String, untyped]
+
+    def ps_plus?: () -> bool?
+    def officially_verified?: () -> bool?
+  end
+end
