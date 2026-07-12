@@ -9,7 +9,8 @@ module PSN
   # and transparently refreshes the ~1h access token. Tokens are never
   # persisted; read #refresh_token and store it yourself for the next session,
   # or pass on_token_refresh: to be handed every new refresh token (the
-  # initial exchange included) as it happens.
+  # initial exchange included) as it happens. If the callback raises, the event
+  # is not re-delivered — rescue and recover via #refresh_token.
   class Auth
     AUTH_BASE = "https://ca.account.sony.com/api/authz/v3/oauth"
     CLIENT_ID = "09515159-7237-4370-9b40-3806e67c0891"

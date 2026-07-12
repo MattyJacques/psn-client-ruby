@@ -32,7 +32,7 @@ Layers, top to bottom:
 
 Cross-cutting pieces:
 
-- **`PSN::Paginator`** (`paginator.rb`) — all list endpoints return `PSN::Collection` (`collection.rb`), a lazy wrapper built by `Paginator.offset` (total-count paging) or `Paginator.cursor`; nothing is fetched until consumed, so `.first(n)` only pulls the pages it needs, and `#total` exposes the server-reported count on offset-paged endpoints. New list methods should follow this pattern.
+- **`PSN::Paginator`** (`paginator.rb`) — all paged list endpoints return `PSN::Collection` (`collection.rb`), a lazy wrapper built by `Paginator.offset` (total-count paging) or `Paginator.cursor`; nothing is fetched until consumed, so `.first(n)` only pulls the pages it needs, and `#total` exposes the server-reported count on offset-paged endpoints. Single-request lists (e.g. `games.library`, `store.wishlist`, per-title trophy lists) stay plain `Enumerator::Lazy`. New paged list methods should follow this pattern.
 - **Models** (`lib/psn_client/models/`) — immutable `Data.define` value objects with a `from_api(hash)` class method and a `raw` member holding the untouched API response. `Mapping` holds shared Sony-value converters (ISO8601 times, `PT..S` durations, platform names, trophy grade counts).
 - **Errors** (`errors.rb`) — everything subclasses `PSN::Error` (carries `#response` with status/body): `AuthenticationError`, `PrivacyError` (403 = private account), `NotFoundError`, `RateLimitError` (`#retry_after`; 429s are never auto-retried — the caller decides), `APIError`.
 - **Types** (`sig/`) — RBS signatures for the public surface, checked against `lib` by Steep (`Steepfile`, `configure_code_diagnostics(D::Ruby.lenient)` — lenient at the Faraday/`Data.define` boundaries, which ship no RBS of their own).

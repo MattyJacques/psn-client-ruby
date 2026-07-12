@@ -42,11 +42,12 @@ client.games.played.total  # server-reported count, without fetching every page
 
 ## Usage
 
-All list calls return `PSN::Collection` — still lazy, so `.first(n)` only
+Paged list calls return `PSN::Collection` — still lazy, so `.first(n)` only
 fetches the pages it needs and `.to_a` fetches everything — with `#total`
 for the server-reported item count on offset-paged endpoints (`nil` on
-cursor-paged ones). Every object exposes `#raw` with the untouched API
-response.
+cursor-paged ones). Single-request lists (like `games.library`, `store.wishlist`,
+and per-title trophy lists) return plain `Enumerator::Lazy` without `#total`.
+Every object exposes `#raw` with the untouched API response.
 
 ```ruby
 # Games played (any account whose privacy settings allow it)
