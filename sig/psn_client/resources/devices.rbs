@@ -1,0 +1,13 @@
+module PSN
+  module Resources
+    class Devices
+      DEVICES_PATH: String
+      DEVICES_PARAMS: ::Hash[String, String]
+      STORAGE_PATH: String
+
+      def initialize: (Connection connection) -> void
+      def all: () -> ::Array[Device]
+      def storage: (?platform: String) -> ::Array[ConsoleStorage]
+    end
+  end
+end

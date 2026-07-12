@@ -1,0 +1,27 @@
+module PSN
+  module Resources
+    class Profiles
+      PROFILE2_PATH: String
+      PROFILE2_FIELDS: String
+      ACCOUNT_ME_PATH: String
+      PROFILE_BY_ACCOUNT_PATH: String
+      SHARE_PATH: String
+      ONLINE_ID_PATTERN: Regexp
+      ORACLE_OPERATION: String
+      ORACLE_HASH: String
+      ORACLE_HEADERS: ::Hash[String, String]
+
+      def initialize: (Connection connection, Users users) -> void
+      def find: (?String? online_id) -> Profile
+      def shareable_link: (?String? online_id) -> ShareableLink
+      def find_by_account_id: (String account_id) -> BasicProfile
+      def account_summary: () -> AccountSummary
+
+      private
+
+      def own_account_id: () -> String?
+      def own_online_id: () -> String?
+      def validate_online_id!: (String online_id) -> String
+    end
+  end
+end

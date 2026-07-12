@@ -1,0 +1,31 @@
+module PSN
+  module Resources
+    class Search
+      CONTEXT_OPERATION: String
+      DOMAIN_OPERATION: String
+      GAMES_CONTEXT: String
+      GAMES_CONTEXT_HASH: String
+      GAMES_DOMAIN_HASH: String
+      USERS_CONTEXT: String
+      USERS_CONTEXT_HASH: String
+      USERS_DOMAIN_HASH: String
+      GAME_DOMAINS: ::Hash[Symbol, String]
+      USERS_DOMAIN: String
+      PAGE_SIZE: Integer
+      HEADERS: ::Hash[String, String]
+      GAMES_QUERIES: ::Hash[Symbol, untyped]
+      USERS_QUERIES: ::Hash[Symbol, untyped]
+
+      def initialize: (Connection connection) -> void
+      def games: (String term, ?domain: Symbol) -> Collection
+      def users: (String term) -> Collection
+
+      private
+
+      def result_items: (String term, domain: String, queries: ::Hash[Symbol, untyped]) -> Collection
+      def context_page: (String term, String domain, ::Hash[Symbol, untyped] queries) -> [::Array[untyped], untyped]
+      def domain_page: (String term, String domain, ::Hash[Symbol, untyped] queries, untyped cursor,
+                         Integer offset) -> [::Array[untyped], untyped]
+    end
+  end
+end

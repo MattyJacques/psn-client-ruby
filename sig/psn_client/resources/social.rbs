@@ -1,0 +1,25 @@
+module PSN
+  module Resources
+    class Social
+      PRESENCE_PATH: String
+      FRIENDS_PATH: String
+      REQUESTS_PATH: String
+      BLOCKS_PATH: String
+      FRIENDSHIP_PATH: String
+      AVAILABLE_PATH: String
+      PAGE_SIZE: Integer
+
+      def initialize: (Connection connection, Users users) -> void
+      def presence: (?String? online_id) -> Presence
+      def friends: (?String? online_id) -> Collection
+      def friend_requests: () -> Collection
+      def blocked: () -> Collection
+      def friendship: (String online_id) -> FriendshipSummary
+      def available_to_play: () -> untyped
+
+      private
+
+      def id_pages: (String path, String key) -> Collection
+    end
+  end
+end

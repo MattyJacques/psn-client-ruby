@@ -1,0 +1,25 @@
+module PSN
+  module Resources
+    class Games
+      TITLES_PATH: String
+      PAGE_SIZE: Integer
+      LIBRARY_OPERATION: String
+      LIBRARY_HASH: String
+      LIBRARY_CATEGORIES: String
+      LIBRARY_LIMIT: Integer
+      LIBRARY_HASH_WEB: String
+      PURCHASED_OPERATION: String
+      PURCHASED_HASH: String
+      PURCHASED_PAGE_SIZE: Integer
+      PURCHASED_VARIABLES: ::Hash[String, untyped]
+      FRIENDS_WHO_PLAY_OPERATION: String
+      FRIENDS_WHO_PLAY_HASH: String
+
+      def initialize: (Connection connection, Users users) -> void
+      def played: (?String? online_id) -> Collection
+      def library: (?limit: Integer) -> Enumerator::Lazy[LibraryTitle, untyped]
+      def purchased: () -> Collection
+      def friends_who_play: (untyped concept_id) -> ::Array[User]
+    end
+  end
+end
