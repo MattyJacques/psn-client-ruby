@@ -27,13 +27,26 @@ client = PSN::Client.new(npsso: "your-npsso")
 # Persist client.refresh_token (lasts ~2 months, rotates on refresh) and
 # skip the NPSSO next time:
 client = PSN::Client.new(refresh_token: saved_token)
+
+# language: is sent as Accept-Language on every request (default "en-US").
+# on_token_refresh: is a push-based alternative to polling client.refresh_token —
+# it's called with each new refresh token as it rotates, initial exchange included.
+client = PSN::Client.new(
+  refresh_token: saved_token,
+  language: "en-GB",
+  on_token_refresh: ->(token) { TokenStore.save(token) }
+)
+
+client.games.played.total  # server-reported count, without fetching every page
 ```
 
 ## Usage
 
-All list calls return lazy enumerators — `.first(n)` only fetches the pages
-it needs, `.to_a` fetches everything. Every object exposes `#raw` with the
-untouched API response.
+All list calls return `PSN::Collection` — still lazy, so `.first(n)` only
+fetches the pages it needs and `.to_a` fetches everything — with `#total`
+for the server-reported item count on offset-paged endpoints (`nil` on
+cursor-paged ones). Every object exposes `#raw` with the untouched API
+response.
 
 ```ruby
 # Games played (any account whose privacy settings allow it)
@@ -151,7 +164,7 @@ with `#retry_after` so the caller decides when to retry.
 
 ```
 bundle install
-bundle exec rake        # rspec + rubocop
+bundle exec rake        # rspec + rubocop + rbs validate + steep
 ruby bin/smoke          # live-API check; needs PSN_NPSSO or PSN_REFRESH_TOKEN
 ```
 
