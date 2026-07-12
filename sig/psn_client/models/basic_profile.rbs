@@ -7,7 +7,7 @@ module PSN
     attr_reader first_name: String?
     attr_reader last_name: String?
     attr_reader about_me: String?
-    attr_reader avatar_urls: ::Hash[untyped, untyped]
+    attr_reader avatar_urls: ::Hash[String, String]
     attr_reader languages: ::Array[untyped]
     attr_reader plus: bool?
     attr_reader officially_verified: bool?
